@@ -1,4 +1,5 @@
 ﻿using EC.Data;
+using EC.Helpers;
 using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,7 @@ namespace EC.Controllers
 
         public IActionResult Index()
         {
-            // ✅ Check if UserId claim exists
-            var userIdClaim = User.FindFirst("UserId");
-            if (userIdClaim == null)
-                return RedirectToAction("Login", "Account");
-
-            int userId = int.Parse(userIdClaim.Value);
+            int userId = HttpContext.UserId() ?? 0;
 
             var orders = _db.GetOrdersByUser(userId);
             return View(orders);

@@ -17,23 +17,9 @@ namespace EC.Controllers
             _db = db;
         }
 
-        // ================= LOGIN CHECK =================
-        private IActionResult CheckLogin()
-        {
-            // If cookie/helper says NOT logged in → force login page
-            if (!HttpContext.IsLoggedIn())
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            return null;
-        }
-
         // ================= HOME =================
         public IActionResult Index(int? categoryId)
         {
-            var check = CheckLogin();
-            if (check != null) return check;
-
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 
@@ -47,9 +33,6 @@ namespace EC.Controllers
         // ================= SEARCH =================
         public IActionResult Search(string query)
         {
-            var check = CheckLogin();
-            if (check != null) return check;
-
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 
@@ -64,9 +47,6 @@ namespace EC.Controllers
         // ================= DETAILS =================
         public IActionResult Details(int id)
         {
-            var check = CheckLogin();
-            if (check != null) return check;
-
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 

@@ -1,16 +1,16 @@
-﻿@{
+﻿@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
     string homeController = "Home";
     string homeAction = "Index";
+    string searchController = "Product";
 
-    if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    if (HttpContextAccessor!.HttpContext!.IsLoggedIn() && HttpContextAccessor!.HttpContext!.IsAdmin())
     {
         homeController = "Admin";
         homeAction = "Dashboard";
+        searchController = "Admin";
     }
-
-    string searchController = (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-        ? "Admin"
-        : "Product";
 }
 
 <html lang="en">

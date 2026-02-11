@@ -17,9 +17,6 @@ public class CheckoutController : Controller
 
     public IActionResult Index()
     {
-        if (!IsLoggedIn())
-            return RedirectToAction("Login", "Account");
-
         var cart = Request.Cookies["Cart"];
         var cartItems = _db.GetCartItemsFromCookie(cart);
 
@@ -49,9 +46,6 @@ public class CheckoutController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult PlaceOrder(CheckoutViewModel model)
     {
-        if (!IsLoggedIn())
-            return RedirectToAction("Login", "Account");
-
         // Recalculate from cart (SECURE)
         var cart = Request.Cookies["Cart"];
         var cartItems = _db.GetCartItemsFromCookie(cart);
@@ -79,9 +73,6 @@ public class CheckoutController : Controller
 
     public IActionResult Success()
     {
-        if (!IsLoggedIn())
-            return RedirectToAction("Login", "Account");
-
         return View();
     }
 }

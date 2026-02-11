@@ -1,12 +1,14 @@
-﻿@{
+﻿@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
     Layout = "_Layout";
     ViewData["Title"] = "Access Denied";
 
     // Determine the redirect URL based on user role
     string redirectUrl = "/";
-    if (User.Identity.IsAuthenticated)
+    if (HttpContextAccessor!.HttpContext!.IsLoggedIn())
     {
-        if (User.IsInRole("Admin"))
+        if (HttpContextAccessor!.HttpContext!.IsAdmin())
         {
             redirectUrl = "/Admin/Dashboard"; 
         }
