@@ -1,0 +1,143 @@
+﻿@model EC.Models.Product
+@{
+    ViewData["Title"] = "Add Product";
+    Layout = "_Layout";
+}
+
+<style>
+    body {
+        background: #f3f4f6;
+    }
+
+    .add-product-container {
+        max-width: 650px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 40px 30px;
+        border-radius: 18px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .add-product-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+        }
+
+        .add-product-container h2 {
+            text-align: center;
+            margin-bottom: 35px;
+            font-weight: 700;
+            font-size: 26px;
+            color: #111827;
+        }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #374151;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .form-control:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+            outline: none;
+        }
+
+    /* Save Button */
+    .btn-save {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 20px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+        transition: all 0.25s ease-in-out;
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79,70,229,0.45);
+            opacity: 0.95;
+        }
+
+    /* Back Link */
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 18px;
+        text-decoration: none;
+        color: #4f46e5;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .back-link:hover {
+            color: #3f37c9;
+            text-decoration: underline;
+        }
+
+    /* Responsive */
+    .media (max-width: 768px) {
+        .add-product-container {
+            padding: 30px 20px;
+        }
+
+        .btn-save {
+            font-size: 15px;
+        }
+    }
+</style>
+
+<div class="add-product-container">
+    <h2>➕ Add New Product</h2>
+
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Product Name</label>
+            <input asp-for="Name" class="form-control" placeholder="Enter product name" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Price (₹)</label>
+            <input asp-for="Price" class="form-control" placeholder="Enter price" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select asp-for="Category" class="form-control" required>
+                <option value="">-- Select Category --</option>
+                @foreach (var cat in ViewBag.Categories)
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Image URL</label>
+            <input asp-for="Image" class="form-control"
+                   placeholder="https://example.com/product.jpg" required />
+        </div>
+
+        <button type="submit" class="btn-save">💾 Save Product</button>
+    </form>
+
+    <a href="/Admin/Products" class="back-link">← Back to Products</a>
+</div>

@@ -1,0 +1,119 @@
+﻿@model List<EC.Models.Order>
+
+@{
+    ViewBag.Title = "My Orders";
+}
+
+<style>
+    .order-card {
+        border-radius: 14px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        color: #fff;
+        padding: 16px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .order-table th {
+        background-color: #f8f9fa;
+        text-transform: uppercase;
+        font-size: 13px;
+    }
+
+    .order-id {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .order-total {
+        font-weight: 600;
+        color: #198754;
+    }
+
+    .order-status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-complete {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="order-card">
+                <div class="order-header">
+                    🧾 My Order History
+                </div>
+
+                <div class="table-responsive p-3">
+
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info text-center">
+                            You have not placed any orders yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="table table-hover order-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Total Amount</th>
+                                    <th>Order Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var o in Model)
+                                {
+                                    <tr>
+                                        <td class="order-id">#@o.Id</td>
+
+                                        <td class="order-total">
+                                            ₹@o.TotalAmount
+                                        </td>
+
+                                        <td>
+                                            @o.OrderDate.ToString("dd MMM yyyy")
+                                        </td>
+
+                                        <td>
+                                            <span class="order-status
+                                                        @(o.Status == "Completed"? "status-complete" : "status-pending")"> @o.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+                                            

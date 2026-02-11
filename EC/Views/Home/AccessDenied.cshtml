@@ -1,0 +1,25 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Access Denied";
+
+    // Determine the redirect URL based on user role
+    string redirectUrl = "/";
+    if (User.Identity.IsAuthenticated)
+    {
+        if (User.IsInRole("Admin"))
+        {
+            redirectUrl = "/Admin/Dashboard"; 
+        }
+        else
+        {
+            redirectUrl = "/User/Home"; 
+        }
+    }
+}
+
+<div style="text-align:center; padding:80px;">
+    <h1 style="font-size:72px; color:#e74c3c;">🚫</h1>
+    <h2>Access Denied</h2>
+    <p>You do not have permission to view this page.</p>
+    <a href="@redirectUrl" class="btn btn-primary mt-3">Go Back</a>
+</div>

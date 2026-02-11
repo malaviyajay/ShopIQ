@@ -1,0 +1,195 @@
+﻿@model EC.Models.CheckoutViewModel
+
+@{
+    ViewBag.Title = "Checkout";
+}
+
+<style>
+    .checkout-container {
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .checkout-card {
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .checkout-header {
+        background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        color: #fff;
+        padding: 18px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .section-title {
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .checkout-box {
+        padding: 20px;
+    }
+
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .summary-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.95rem;
+    }
+
+    .grand-total {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .place-btn {
+        border-radius: 30px;
+        padding: 12px;
+        font-size: 1.05rem;
+    }
+</style>
+
+<div class="container mt-4 checkout-container">
+
+    <form asp-action="PlaceOrder" method="post">
+
+        @Html.AntiForgeryToken()
+
+        <!-- Hidden values for binding -->
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="UserName" />
+        <input type="hidden" asp-for="TotalAmount" />
+
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <input type="hidden" asp-for="Items[i].ProductId" />
+            <input type="hidden" asp-for="Items[i].ProductName" />
+            <input type="hidden" asp-for="Items[i].Quantity" />
+            <input type="hidden" asp-for="Items[i].Price" />
+        }
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-controller="Cart" asp-action="Index">Cart</a>
+                </li>
+                <li class="breadcrumb-item active">Checkout</li>
+            </ol>
+        </nav>
+
+        <div class="checkout-card">
+
+            <div class="checkout-header">
+                🔒 Secure Checkout
+            </div>
+
+            <div class="row checkout-box">
+
+                <!-- LEFT -->
+                <div class="col-md-7">
+                    <div class="section-title">Payment Method</div>
+
+                    <div class="card p-3">
+
+                        <!-- Proper model binding -->
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   asp-for="PaymentMethod"
+                                   value="COD"
+                                   checked>
+
+                            <label class="form-check-label">
+                                Cash on Delivery
+                            </label>
+                        </div>
+
+                        <div class="form-check mt-2">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   asp-for="PaymentMethod"
+                                   value="Online">
+
+                            <label class="form-check-label">
+                                Online Payment
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="col-md-5">
+                    <div class="order-summary">
+
+                        <div class="section-title">Order Summary</div>
+
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="summary-line">
+                                <span>@item.ProductName</span>
+                                <span>
+                                    @item.Quantity × ₹@item.Price =
+                                    ₹@(item.Quantity* item.Price)
+                                </span>
+                            </div>
+                        }
+
+                        <hr />
+
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span>₹ @Model.TotalAmount</span>
+                        </div>
+
+                        <div class="summary-line">
+                            <span>Shipping</span>
+                            <span>₹ 0 (Free)</span>
+                        </div>
+
+                        <div class="summary-line">
+                            <span>Tax</span>
+                            <span>₹ 0</span>
+                        </div>
+
+                        <hr/>
+
+                        <div class="summary-line">
+                            <span class="fw-bold">Total</span>
+                            <span class="grand-total">
+                                ₹ @Model.TotalAmount
+                            </span>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100 place-btn mt-3">
+                            Place Order
+                        </button>
+
+                        <p class="text-muted text-center mt-3">
+                            🔒 Secure payment protected by SSL
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>

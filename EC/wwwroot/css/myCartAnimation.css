@@ -1,0 +1,12 @@
+﻿.cart-animation {
+    position: fixed;
+    bottom: 20px;
+    left: -100px; /* start off-screen */
+    z-index: 1000;
+    transition: transform 2s ease-in-out;
+}
+
+.truck {
+    width: 60px;
+    height: auto;
+}

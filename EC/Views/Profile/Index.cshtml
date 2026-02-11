@@ -1,0 +1,127 @@
+﻿@if (Model == null)
+{
+    <div class="alert alert-warning">
+        Profile not loaded
+    </div>
+    return;
+}
+<style>
+    .profile-bg {
+        background: #f3f3f3;
+        min-height: 100vh;
+        padding: 30px 0;
+    }
+
+    .profile-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        background: white;
+    }
+
+    .profile-header {
+        background: #232f3e;
+        color: white;
+        padding: 20px;
+        border-radius: 12px 12px 0 0;
+    }
+
+        .profile-header h3 {
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .profile-header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #d5d9d9;
+        }
+
+    .menu-card {
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+        .menu-card .list-group-item {
+            border: none;
+            padding: 15px 20px;
+        }
+
+            .menu-card .list-group-item a {
+                color: #111;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .menu-card .list-group-item:hover {
+                background: #f0f2f5;
+            }
+
+    .profile-info h6 {
+        font-weight: 700;
+        font-size: 14px;
+        color: #111;
+    }
+
+    .profile-info p {
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+
+<div class="profile-bg">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- Left Menu -->
+            <div class="col-md-3">
+                <div class="menu-card p-3">
+                    <h5 class="fw-bold mb-3">Your Account</h5>
+
+                    <div class="mt-3">
+                        <a asp-controller="Profile" asp-action="Edit" class="btn btn-primary w-100">
+                            Edit Profile
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="col-md-9">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <h3>Hello, @Model.Name</h3>
+                        <p>Manage your account settings and preferences</p>
+                    </div>
+
+                    <div class="p-4 profile-info">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6>Name</h6>
+                                <p>@Model.Name</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6>Email</h6>
+                                <p>@Model.Email</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6>Phone</h6>
+                                <p>@Model.Phone</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6>Address</h6>
+                                <p>@Model.Address</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+         </div>
+        <button type="button" class="btn btn-outline-secondary ms-2" onclick="history.back();">
+            <i class="bi bi-arrow-left"></i> Go Back
+        </button>
+
+    </div>
+</div>

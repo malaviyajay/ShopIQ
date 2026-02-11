@@ -1,0 +1,139 @@
+﻿@model List<EC.Models.Order>
+@{
+    ViewData["Title"] = "All Orders";
+    Layout = "_Layout";
+}
+
+<style>
+    .orders-container {
+        padding: 30px;
+    }
+
+    .orders-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: #111827;
+    }
+
+    .orders-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+    }
+
+        .table thead {
+            background: #f3f4f6;
+        }
+
+            .table thead th {
+                font-weight: 600;
+                color: #374151;
+                border-bottom: none;
+                padding: 14px;
+                text-align: left;
+            }
+
+        .table tbody td {
+            padding: 14px;
+            vertical-align: middle;
+            color: #374151;
+        }
+
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+    .badge-amount {
+        background: #ecfeff;
+        color: #0369a1;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .empty-box {
+        text-align: center;
+        padding: 40px;
+        border-radius: 14px;
+        background: #fffbeb;
+        color: #92400e;
+        font-weight: 500;
+        font-size: 16px;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #5B4BFF, #3F37C9);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        margin-top: 20px;
+        display: inline-block;
+    }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #4a3ecf, #352eb0);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.4);
+        }
+</style>
+
+<div class="orders-container">
+    <div class="orders-title">🧾 All Orders</div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-box">
+            No orders found.
+        </div>
+    }
+    else
+    {
+        <div class="orders-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User Name</th>
+                        <th>Total Amount</th>
+                        <th>Order Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>#@order.Id</td>
+                            <td>@order.UserName</td>
+                            <td>
+                                <span class="badge-amount">
+                                    ₹@order.TotalAmount
+                                </span>
+                            </td>
+                            <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <button type="button" class="btn-back" onclick="history.back();">
+        Go Back
+    </button>
+</div>

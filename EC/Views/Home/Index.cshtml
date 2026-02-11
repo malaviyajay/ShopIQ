@@ -1,0 +1,273 @@
+﻿@model List<EC.Models.Product>
+
+@{
+    ViewBag.Title = "Home";
+}
+
+
+<style>
+    /* ===== BODY & GENERAL ===== */
+    body {
+        min-height: 100vh;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        background: #D3D3D3; /* dark gray-brown background */
+    }
+
+    /* ===== HERO SECTION WITH ANIMATED GRADIENT ===== */
+    .hero {
+        border-radius: 18px;
+        padding: 50px 30px;
+        margin: 30px auto;
+        max-width: 1200px;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        /* Warm animated gradient background */
+        background: linear-gradient(-45deg, #ff7e5f, #feb47b, #ffb347, #ffc857);
+        background-size: 400% 400%;
+        animation: gradientAnimation 15s ease infinite;
+    }
+
+    @@keyframes gradientAnimation {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .hero h1, .hero p, .hero .btn {
+        position: relative;
+    }
+
+    .hero h1 {
+        font-weight: 900;
+        font-size: 2.8rem;
+        letter-spacing: 1px;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        color: #fff;
+    }
+
+    .hero p {
+        font-size: 1.3rem;
+        margin-top: 12px;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        color: #fff;
+    }
+
+    .hero .btn {
+        border-radius: 30px;
+        padding: 12px 25px;
+        font-weight: 700;
+        margin-top: 20px;
+        background: #ff9900; /* Amazon-style warm orange */
+        border: none;
+        color: #2b2b2b;
+        transition: all 0.3s;
+    }
+
+        .hero .btn:hover {
+            background: #ffc857;
+            transform: translateY(-3px);
+        }
+
+    /* ===== PRODUCTS SECTION ===== */
+    .products-section {
+        max-width: 1200px;
+        margin: 0 auto 50px;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #ff9900; /* orange accent */
+        margin: 25px 0 15px;
+        border-left: 5px solid #ffc857; /* light gold border */
+        padding-left: 10px;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .product-card {
+        border-radius: 16px;
+        transition: all .3s ease;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        height: 100%;
+        background: #fff; /* white product card */
+        color: #2b2b2b;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+        }
+
+    .product-img {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 14px;
+        transition: all 0.3s;
+    }
+
+        .product-img:hover {
+            transform: scale(1.05);
+        }
+
+    .price {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #b12704; /* red price */
+    }
+
+    .old-price {
+        text-decoration: line-through;
+        color: #565959;
+        margin-left: 5px;
+    }
+
+    .discount-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #007600; /* green discount badge */
+        color: #fff;
+        padding: 4px 10px;
+        font-size: 12px;
+        border-radius: 20px;
+    }
+
+    .btn-rounded {
+        border-radius: 30px;
+        transition: all 0.3s;
+    }
+
+        .btn-rounded:hover {
+            transform: translateY(-2px);
+        }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+
+        .hero p {
+            font-size: 1rem;
+        }
+
+        .products-section {
+            padding: 15px;
+        }
+
+        .product-img {
+            height: 180px;
+        }
+    }
+</style>
+
+@* <!-- ===== HERO SECTION ===== -->
+<div class="hero">
+    <h1>Welcome to EC Shop!</h1>
+    <p>Discover the best deals and latest arrivals.</p>
+    <a asp-controller="Account" asp-action="Product" class="btn btn-lg">
+        Start Shopping
+    </a>
+</div> *@
+
+<!-- ===== PRODUCTS SECTION ===== -->
+<div class="products-section">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning text-dark">
+            No products available right now.
+        </div>
+    }
+    else
+    {
+        <!-- BEST DEALS -->
+        <div class="mb-4">
+            <h4 class="section-title">Best Deals</h4>
+            <div class="row g-4">
+                @foreach (var p in Model.Take(6))
+                {
+                    var discount = 15;
+                    var oldPrice = p.Price + (p.Price * discount / 100);
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card product-card p-3 text-center">
+                            <span class="discount-badge">@discount% OFF</span>
+                            <img src="@Url.Content("~/images/products/" + p.Image)"
+                                 class="product-img mb-3"
+                                 alt="@p.Name" />
+
+
+                            <h6 class="fw-semibold">@p.Name</h6>
+                            <p>
+                                <span class="price">₹@p.Price</span>
+                                <span class="old-price">₹@oldPrice</span>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Product"asp-action="Details"asp-route-id="@p.Id"
+                                   class="btn btn-outline-primary btn-sm btn-rounded">
+                                    View
+                                </a>
+
+                                <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"
+                                   class="btn btn-success btn-sm btn-rounded">
+                                    Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- NEW ARRIVALS -->
+        <div class="mb-4">
+            <h4 class="section-title">New Arrivals</h4>
+            <div class="row g-4">
+                @foreach (var p in Model.Skip(6).Take(6))
+                {
+                    var discount = 10;
+                    var oldPrice = p.Price + (p.Price * discount / 100);
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card product-card p-3 text-center">
+                            <span class="discount-badge">@discount% OFF</span>
+                            <img src="@p.Image" class="product-img mb-3" />
+                            <h6 class="fw-semibold">@p.Name</h6>
+                            <p>
+                                <span class="price">₹@p.Price</span>
+                                <span class="old-price">₹@oldPrice</span>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Product"asp-action="Details"asp-route-id="@p.Id"class="btn btn-outline-primary btn-sm btn-rounded">
+                                    View
+                                </a>
+
+                                <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"class="btn btn-success btn-sm btn-rounded">
+                                    Add to Cart
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

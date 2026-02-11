@@ -1,0 +1,218 @@
+﻿@model List<EC.Models.Product>
+@{
+    ViewData["Title"] = "Products";
+    Layout = "_Layout";
+}
+
+<style>
+    body {
+        background: #f3f4f6;
+    }
+
+    .products-container {
+        padding: 40px 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        gap: 15px;
+    }
+
+        .products-header h3 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+    .btn-add {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+        transition: all 0.25s ease-in-out;
+        text-decoration: none;
+    }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(99, 102, 241, 0.45);
+            opacity: 0.95;
+        }
+
+    .products-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        margin-bottom: 0;
+    }
+
+        .table thead {
+            background: #f9fafb;
+        }
+
+            .table thead th {
+                font-weight: 600;
+                color: #374151;
+                padding: 16px 14px;
+                border-bottom: none;
+                text-align: left;
+                font-size: 14px;
+            }
+
+        .table tbody td {
+            padding: 14px 14px;
+            vertical-align: middle;
+            background: #ffffff;
+            border-radius: 12px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .table tbody tr:hover td {
+            background: #f3f4f6;
+            transition: background 0.2s;
+        }
+
+    .price-badge {
+        background: #ecfeff;
+        color: #0369a1;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .action-btns a {
+        font-size: 14px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.25s ease-in-out;
+    }
+
+        .action-btns a.edit {
+            background: linear-gradient(135deg, #facc15, #eab308);
+            color: #1f2937;
+            margin-right: 8px;
+            box-shadow: 0 4px 14px rgba(250,204,21,0.3);
+        }
+
+        .action-btns a.delete {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(239,68,68,0.3);
+        }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6b5dfc, #5145cd);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        cursor: pointer;
+        margin-top: 25px;
+    }
+
+    /* ✅ FIXED MEDIA QUERY */
+    @@media (max-width: 768px) {
+        .products-header {
+            flex-direction: column;
+        }
+
+        .btn-add, .btn-back {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+
+<div class="products-container">
+
+    <div class="products-header">
+        <h3>Product List</h3>
+
+        <a href="/Admin/Add" class="btn-add">+ Add New Product</a>
+    </div>
+
+
+    <div class="products-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th style="width:180px">Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="productTable">
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@p.Name</td>
+                        <td><span class="price-badge">₹@p.Price</span></td>
+                        <td>@p.CategoryName</td>
+                        <td class="action-btns">
+                            <a href="/Admin/Edit/@p.Id" class="edit">Edit</a>
+                            <a href="/Admin/Delete/@p.Id" class="delete"
+                               onclick="return confirm('Delete this product?')">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="button" class="btn-back" onclick="history.back();">
+            ← Go Back
+        </button>
+    </div>
+
+</div>
+
+
+<!-- ✅ WORKING SEARCH SCRIPT -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const input = document.getElementById("productSearch");
+        const rows = document.querySelectorAll("#productTable tr");
+
+        input.addEventListener("keyup", function () {
+
+            let filter = input.value.toLowerCase();
+
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+
+                row.style.display = text.includes(filter)
+                    ? ""
+                    : "none";
+            });
+
+        });
+
+    });
+</script>

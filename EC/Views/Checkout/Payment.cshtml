@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Payment";
+}
+
+<h2>Pay Now</h2>
+
+<form>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"
+            data-
+            
+            ="@ViewBag.Key"
+            data-amount="50000"
+            data-currency="INR"
+            data-order_id="@ViewBag.OrderId"
+            data-buttontext="Pay Now"
+            data-name="EC Shop"
+            data-description="Payment"
+            data-theme.color="#3399cc">
+    </script>
+</form>
