@@ -18,7 +18,7 @@ namespace EC.Data
         public SqlConnection GetConnection()
         {
             return new SqlConnection(_con);
-        }
+        }   
 
         // ================= USERS =================
 
@@ -28,12 +28,14 @@ namespace EC.Data
             con.Open();
 
             var cmd = new SqlCommand(
-            @"INSERT INTO Users (Name, Email, Password, IsAdmin)
-              VALUES (@n,@e,@p,@a)", con);
+            @"INSERT INTO Users (Name, Email, Password,Address,Phone, IsAdmin)
+              VALUES (@n,@e,@p,@d,@m,@a)", con);
 
             cmd.Parameters.AddWithValue("@n", user.Name);
             cmd.Parameters.AddWithValue("@e", user.Email);
             cmd.Parameters.AddWithValue("@p", user.Password);
+            cmd.Parameters.AddWithValue("@d", user.Address);
+            cmd.Parameters.AddWithValue("@m", user.Phone);
             cmd.Parameters.AddWithValue("@a", user.IsAdmin);
 
             cmd.ExecuteNonQuery();
@@ -118,7 +120,7 @@ namespace EC.Data
             using var con = GetConnection();
             con.Open();
 
-            // 🔥 Update Users table (Name only)
+            
             var userCmd = new SqlCommand(
                 "UPDATE Users SET Name=@n WHERE Id=@uid", con);
 
@@ -126,8 +128,6 @@ namespace EC.Data
             userCmd.Parameters.AddWithValue("@uid", model.Id);
             userCmd.ExecuteNonQuery();
 
-
-            // 🔥 Insert / Update profile table
             var cmd = new SqlCommand(@"
             IF EXISTS (SELECT 1 FROM UserProfiles WHERE UserId=@uid)
                 UPDATE UserProfiles
@@ -520,6 +520,28 @@ namespace EC.Data
                 SqlCommand cmd = new SqlCommand("SELECT ISNULL(SUM(TotalAmount),0) FROM Orders", conn);
                 return (decimal)cmd.ExecuteScalar();
             }
+        }
+
+        public void UpdateUser(User user)
+        {
+            using var con = GetConnection();
+            con.Open();
+
+            var cmd = new SqlCommand(
+                @"UPDATE Users 
+                 SET Name = @name, 
+                 Email = @email, 
+                 Phone = @phone, 
+                 Address = @address
+          WHERE Id = @id", con);
+
+            cmd.Parameters.AddWithValue("@name", user.Name);
+            cmd.Parameters.AddWithValue("@email", user.Email);
+            cmd.Parameters.AddWithValue("@phone", user.Phone);
+            cmd.Parameters.AddWithValue("@address", user.Address);
+            cmd.Parameters.AddWithValue("@id", user.Id);
+
+            cmd.ExecuteNonQuery();
         }
 
     }

@@ -44,16 +44,9 @@ public class AccountController : Controller
             new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin": "Customer")
         };
 
-        var identity = new ClaimsIdentity(
-            claims,
-            CookieAuthenticationDefaults.AuthenticationScheme
-        );
+        var identity = new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme);
 
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(identity),
-            new AuthenticationProperties { IsPersistent = true }
-        );
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(identity),new AuthenticationProperties { IsPersistent = true });
 
         if (user.IsAdmin)
             return RedirectToAction("Dashboard", "Admin");

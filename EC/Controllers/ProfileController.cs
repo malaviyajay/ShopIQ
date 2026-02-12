@@ -34,26 +34,46 @@ public class ProfileController : Controller
     }
 
     // ================= EDIT PAGE =================
+    [HttpGet]
     public IActionResult Edit()
     {
-        var profile = _db.GetUserProfile(GetUserId());
-        if (profile == null)
-            profile = new User();
+        int userId = GetUserId();
+        var user = _db.GetUserProfile(userId);
 
-        return View(profile);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return View(user);
     }
 
+
     // ================= SAVE EDIT =================
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Edit(User model)
     {
         if (!ModelState.IsValid)
-            return View(model);
+        {
+            return View(model); 
+        }
 
-        model.Id = GetUserId();
-        _db.SaveUserProfile(model);
+        var user = _db.GetUserProfile(model.Id);
+        if (user == null)
+        {
+            return NotFound();
+        }
 
-        return RedirectToAction("Index");
+        user.Name = model.Name;
+        user.Email = model.Email;
+        user.Phone = model.Phone;
+        user.Address = model.Address;
+
+        _db.UpdateUser(user); 
+
+        TempData["Success"] = "Profile updated successfully!";
+        return RedirectToAction("Profile"); 
     }
 }

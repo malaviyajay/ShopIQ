@@ -2,6 +2,7 @@
 using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace EC.Controllers;
 
@@ -96,4 +97,48 @@ public class AdminController : Controller
 
         return View("Products", products);
     }
+
+    [HttpGet]
+    public IActionResult UserList()
+    {
+        List<User> users = new List<User>();
+
+        using var con = _db.GetConnection();
+        con.Open();
+
+        var cmd = new SqlCommand("SELECT Id, Name, Email, IsAdmin FROM Users", con);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            users.Add(new User
+            {
+                Id = Convert.ToInt32(reader["Id"]),
+                Name = Convert.ToString(reader["Name"]),
+                Email = Convert.ToString(reader["Email"]),
+                IsAdmin = Convert.ToBoolean(reader["IsAdmin"])
+            });
+        }
+
+        return View(users);
+    }
+
+    [HttpPost]
+    public IActionResult UserList(int userId, string role)
+    {
+        bool isAdmin = role == "Admin";
+
+        using var con = _db.GetConnection();
+        con.Open();
+
+        var cmd = new SqlCommand("UPDATE Users SET IsAdmin=@isAdmin WHERE Id=@id", con);
+        cmd.Parameters.AddWithValue("@isAdmin", isAdmin);
+        cmd.Parameters.AddWithValue("@id", userId);
+
+        cmd.ExecuteNonQuery();
+
+        TempData["Success"] = "Role updated successfully!";
+        return RedirectToAction("Userlist");
+    }
+
+
 }
