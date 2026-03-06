@@ -4,155 +4,143 @@
     Layout = "_Layout";
 }
 
-<h2 class="page-title">User List</h2>
-
 <style>
-    
-    .page-title {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 28px;
-        color: #333;
-        margin-bottom: 30px;
+
+    body {
+        background: #eaeded;
+        font-family: Arial, Helvetica, sans-serif;
     }
 
+    .page-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
 
+    /* ===== CARD ===== */
+    .card-box {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    /* ===== TABLE ===== */
     table.custom-table {
         width: 100%;
         border-collapse: collapse;
-        font-family: 'Poppins', sans-serif;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border-radius: 12px;
-        overflow: hidden;
     }
 
         table.custom-table thead {
-            background: linear-gradient(135deg, #6b5dfc, #5145cd);
-            color: #fff;
+            background: #f3f3f3;
         }
 
-        table.custom-table th,
-        table.custom-table td {
-            padding: 15px 20px;
+        table.custom-table th {
+            padding: 14px;
             text-align: left;
+            font-size: 13px;
+            color: #555;
+            text-transform: uppercase;
         }
 
-        table.custom-table tbody tr {
-            transition: background 0.3s;
+        table.custom-table td {
+            padding: 14px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
         }
 
-            table.custom-table tbody tr:hover {
-                background: rgba(79, 70, 229, 0.05);
-            }
+        table.custom-table tbody tr:hover {
+            background: #fafafa;
+        }
 
-   
+    /* ===== SELECT ===== */
     select.form-select {
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        padding: 6px 12px;
-        font-size: 14px;
-        outline: none;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        font-size: 13px;
+        background: #fff;
     }
 
-   
+    /* ===== AMAZON BUTTON ===== */
     .btn-update {
-        background: linear-gradient(135deg, #6b5dfc, #5145cd);
-        color: #fff;
-        border: none;
-        border-radius: 8px;
+        background: #ffd814;
+        border: 1px solid #fcd200;
+        color: #111;
+        border-radius: 6px;
         padding: 6px 14px;
-        font-weight: 500;
-        font-size: 14px;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        font-weight: 600;
+        font-size: 13px;
     }
 
         .btn-update:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+            background: #f7ca00;
         }
 
-    
     .btn-back {
-        background: linear-gradient(135deg, #6b5dfc, #5145cd);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 24px;
+        background: #ffd814;
+        border: 1px solid #fcd200;
+        color: #111;
+        border-radius: 6px;
+        padding: 8px 18px;
         font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
-        cursor: pointer;
-        margin-top: 25px;
-        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 18px;
     }
 
         .btn-back:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+            background: #f7ca00;
         }
 
-
-    @@media (max-width: 768px) {
-        table.custom-table thead {
-            display: none;
-        }
-
-        table.custom-table tbody tr {
-            display: block;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 15px;
-        }
-
-        table.custom-table tbody td {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-        }
-
-            table.custom-table tbody td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #555;
-            }
-    }
 </style>
 
-<table class="custom-table">
-    <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Username</th>
-            <th scope="col">Email</th>
-            <th scope="col">Role</th>
-            <th scope="col">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr>
-                <td data-label="ID">@user.Id</td>
-                <td data-label="Username">@user.Name</td>
-                <td data-label="Email">@user.Email</td>
-                <td data-label="Role">@((user.IsAdmin) ? "Admin" : "User")</td>
-                <td data-label="Action">
-                    <form action="" method="post" style="display:flex; gap:10px;">
-                        <input type="hidden" name="userId" value="@user.Id" />
-                        <select name="role" class="form-select">
-                            <option value="User" selected="@(user.IsAdmin ? "" : "selected")">User</option>
-                            <option value="Admin" selected="@(user.IsAdmin ? "selected" : "")">Admin</option>
-                        </select>
-                        <button type="submit" class="btn-update">Update</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<h2 class="page-title">Users</h2>
 
-<button type="button" class="btn-back" onclick="history.back();">
-    ← Go Back
-</button>
+<div class="card-box">
+
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                  
+
+                            <td>
+                            <form asp-action="UpdateUserRole"asp-controller="Admin"method="post"style="display:flex; gap:10px;">
+
+                                <input type="hidden" name="userId" value="@user.Id" />
+                            <select name="roleId" required>
+                                <option disabled selected>-- Select Role --</option>
+                                <option value="1">Admin</option>
+                                <option value="2">Seller</option>
+                                <option value="3">Customer</option>
+                            </select>
+
+                                <button type="submit" class="btn-update">
+                                    Update
+                                </button>
+                            </form>
+                        </td>
+                  </tr>
+            }
+        </tbody>
+
+    </table>
+
+    <button type="button" class="btn-back" onclick="history.back();">
+        ← Go Back
+    </button>
+
+</div>

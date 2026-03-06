@@ -4,145 +4,282 @@
     Layout = "_Layout";
 }
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 <style>
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --border-color: #e7e7e7;
+    }
+
     body {
-        background: #f3f4f6;
+        background: var(--bg-light);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-main);
     }
 
-    .edit-product-container {
+    .edit-product-bg {
+        padding: 40px 15px;
+        min-height: 80vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .dashboard-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        width: 100%;
         max-width: 650px;
-        margin: 50px auto;
-        background: #ffffff;
-        padding: 40px 30px;
-        border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        overflow: hidden;
     }
 
-    .edit-product-container:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    /* ===== HEADER ===== */
+    .card-header-custom {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        padding: 25px 30px;
     }
 
-    .edit-product-container h2 {
-        text-align: center;
-        margin-bottom: 35px;
-        font-weight: 700;
-        font-size: 26px;
-        color: #111827;
+        .card-header-custom h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 0 5px 0;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header-custom p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+    /* ===== FORM STYLES ===== */
+    .form-body {
+        padding: 30px;
     }
 
     .form-label {
+        font-size: 0.95rem;
         font-weight: 600;
+        color: var(--text-main);
         margin-bottom: 8px;
-        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .form-control {
-        border-radius: 12px;
-        padding: 12px 14px;
-        border: 1px solid #d1d5db;
-        font-size: 14px;
+        .form-label i {
+            color: var(--text-muted);
+            width: 16px;
+            text-align: center;
+        }
+
+    .custom-input {
         width: 100%;
-        box-sizing: border-box;
-        transition: all 0.2s ease-in-out;
+        border: 1px solid #d5d9d9;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        color: var(--text-main);
+        background-color: var(--white);
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(213,217,217,0.2) inset;
+        margin-bottom: 20px;
     }
 
-    .form-control:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
-        outline: none;
+        .custom-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 113, 133, 0.15);
+            outline: none;
+        }
+
+    /* ===== QUANTITY GROUP ===== */
+    .quantity-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
     }
 
-    /* Update Button */
-    .btn-update {
-        width: 100%;
-        padding: 14px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        color: #fff;
-        font-size: 16px;
-        font-weight: 600;
-        margin-top: 20px;
-        border: none;
+    .qty-btn {
+        background: var(--bg-light);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
         cursor: pointer;
-        box-shadow: 0 6px 16px rgba(79,70,229,0.35);
-        transition: all 0.25s ease-in-out;
+        transition: all 0.2s;
     }
 
-    .btn-update:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(79,70,229,0.45);
-        opacity: 0.95;
+        .qty-btn:hover {
+            background: #e3e6e6;
+        }
+
+    .qty-btn-minus {
+        border-radius: 8px 0 0 8px;
     }
 
-    /* Back Button */
+    .qty-btn-plus {
+        border-radius: 0 8px 8px 0;
+    }
+
+    .qty-input {
+        width: 70px;
+        height: 42px;
+        border: 1px solid var(--border-color);
+        border-left: none;
+        border-right: none;
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        background: var(--white);
+    }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            border-left: 1px solid var(--primary-color);
+            border-right: 1px solid var(--primary-color);
+            z-index: 1;
+        }
+
+    /* ===== BUTTONS ===== */
+    .btn-save {
+        background: var(--secondary-color);
+        border: 1px solid transparent;
+        color: var(--text-main);
+        padding: 12px 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(213,217,217,0.5);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+        .btn-save:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-1px);
+        }
+
     .btn-back {
-        display: block;
-        width: 100%;
-        margin-top: 15px;
-        padding: 14px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #6b5dfc, #5145cd);
-        color: #fff;
-        font-size: 15px;
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        padding: 12px 25px;
+        font-size: 1rem;
         font-weight: 600;
-        border: none;
+        border-radius: 50px;
         cursor: pointer;
-        box-shadow: 0 6px 16px rgba(79,70,229,0.35);
-        transition: all 0.25s ease-in-out;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
     }
 
-    .btn-back:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(79,70,229,0.45);
-        opacity: 0.95;
-    }
+        .btn-back:hover {
+            background: var(--bg-light);
+            border-color: #d1d1d1;
+        }
 
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .edit-product-container {
-            padding: 30px 20px;
-        }
-        .btn-update, .btn-back {
-            font-size: 15px;
-        }
-    }
 </style>
 
-<div class="edit-product-container">
-    <h2>✏️ Edit Product</h2>
+<div class="container edit-product-bg">
+    <div class="dashboard-card">
 
-    <form method="post">
-        <input type="hidden" asp-for="Id" />
-
-        <div class="mb-3">
-            <label class="form-label">Product Name</label>
-            <input asp-for="Name" class="form-control" placeholder="Enter product name" required />
+        <div class="card-header-custom">
+            <h3><i class="fas fa-edit text-primary"></i> Edit Product</h3>
+            <p>Update the details and stock availability for this item.</p>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Price (₹)</label>
-            <input asp-for="Price" class="form-control" placeholder="Enter price" required />
+        <div class="form-body">
+            <form method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <label class="form-label"><i class="fas fa-tag"></i> Product Name</label>
+                <input asp-for="Name" class="custom-input" required />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label"><i class="fas fa-rupee-sign"></i> Price (₹)</label>
+                        <input asp-for="Price" class="custom-input" type="number" step="0.01" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label"><i class="fas fa-list"></i> Category</label>
+                        <select asp-for="CategoryId" asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))" class="custom-input" required>
+                            <option value="">-- Select Category --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <label class="form-label"><i class="fas fa-image"></i> Image File Name</label>
+                <input asp-for="Image" class="custom-input" required />
+
+                <label class="form-label"><i class="fas fa-cubes"></i> Available Quantity</label>
+                <div class="quantity-container">
+                    <button type="button" class="qty-btn qty-btn-minus" onclick="changeQuantity(-1)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+
+                    <input asp-for="Quantity" id="quantity-input" class="qty-input" type="number" min="1" required />
+
+                    <button type="button" class="qty-btn qty-btn-plus" onclick="changeQuantity(1)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div class="mt-4 pt-3 border-top">
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
+
+                    <button type="button" class="btn-back" onclick="history.back();">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </button>
+                </div>
+
+            </form>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Category</label>
-            <select asp-for="CategoryId" class="form-control" required>
-                <option value="">-- Select Category --</option>
-                @foreach (var c in ViewBag.Categories)
-                {
-                    <option value="@c.Id">@c.Name</option>
-                }
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Image URL</label>
-            <input asp-for="Image" class="form-control" placeholder="https://example.com/product.jpg" required />
-        </div>
-
-        <button type="submit" class="btn-update">💾 Update Product</button>
-        <button type="button" class="btn-back" onclick="history.back();">← Go Back</button>
-    </form>
+    </div>
 </div>
+
+<script>
+    function changeQuantity(delta) {
+        const qtyInput = document.getElementById('quantity-input');
+        let current = parseInt(qtyInput.value) || 1;
+        current += delta;
+
+        // Ensure quantity doesn't drop below 1
+        if (current < 1) {
+            current = 1;
+        }
+
+        qtyInput.value = current;
+    }
+</script>

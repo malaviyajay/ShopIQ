@@ -2,12 +2,10 @@
 using EC.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
 
 namespace EC.Controllers
 {
-    [Authorize(Roles = "Customer")]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly DbHelper _db;
@@ -20,6 +18,17 @@ namespace EC.Controllers
         // ================= HOME =================
         public IActionResult Index(int? categoryId)
         {
+            var selectedRole = HttpContext.RoleId() ?? 0;
+            if (selectedRole == 1)
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            else if (selectedRole == 2)
+            {
+                return RedirectToAction("Index", "Seller");
+            }
+
+
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 
@@ -31,13 +40,14 @@ namespace EC.Controllers
         }
 
         // ================= SEARCH =================
+       
         public IActionResult Search(string query)
         {
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 
             var products = _db.GetProducts()
-                .Where(p => p.Name != null &&
+                .Where(p => !string.IsNullOrEmpty(p.Name) &&
                             p.Name.Contains(query ?? "", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
@@ -45,23 +55,23 @@ namespace EC.Controllers
         }
 
         // ================= DETAILS =================
+        
         public IActionResult Details(int id)
         {
             ViewBag.Categories = _db.GetCategories();
             ViewBag.BackUrl = "/Home/Index";
 
-            var product = _db.GetProduct(id);
+            var product = _db.GetProducts(id);
             if (product == null)
                 return NotFound();
 
             return View(product);
         }
 
-        // ================= ACCESS DENIED =================
+        // ================= ACCESS DENIED =================    
         [AllowAnonymous]
         public IActionResult AccessDenied()
         {
-            ViewData["Title"] = "Access Denied";
             return View();
         }
     }

@@ -4,270 +4,260 @@
     ViewBag.Title = "Home";
 }
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* ===== BODY & GENERAL ===== */
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --danger: #CC0C39;
+        --border-color: #e7e7e7;
+    }
+
     body {
-        min-height: 100vh;
-        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-        color: #fff;
+        background-color: var(--bg-light);
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        color: var(--text-main);
         margin: 0;
-        padding: 0;
-        background: #D3D3D3; /* dark gray-brown background */
     }
 
-    /* ===== HERO SECTION WITH ANIMATED GRADIENT ===== */
-    .hero {
-        border-radius: 18px;
-        padding: 50px 30px;
-        margin: 30px auto;
-        max-width: 1200px;
+    /* HERO */
+    .hero-container {
         position: relative;
-        overflow: hidden;
+        background: linear-gradient(to bottom, rgba(15,17,17,0.7), rgba(15,17,17,0.2)), url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=2070');
+        background-size: cover;
+        background-position: center;
+        height: 450px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        /* Warm animated gradient background */
-        background: linear-gradient(-45deg, #ff7e5f, #feb47b, #ffb347, #ffc857);
-        background-size: 400% 400%;
-        animation: gradientAnimation 15s ease infinite;
+        margin-bottom: 2rem;
     }
 
-    @@keyframes gradientAnimation {
-        0% {
-            background-position: 0% 50%;
+    .hero-content {
+        color: white;
+        max-width: 800px;
+        padding: 0 20px;
+    }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
         }
 
-        50% {
-            background-position: 100% 50%;
-        }
-
-        100% {
-            background-position: 0% 50%;
-        }
-    }
-
-    .hero h1, .hero p, .hero .btn {
-        position: relative;
-    }
-
-    .hero h1 {
-        font-weight: 900;
-        font-size: 2.8rem;
-        letter-spacing: 1px;
-        text-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        color: #fff;
-    }
-
-    .hero p {
-        font-size: 1.3rem;
-        margin-top: 12px;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        color: #fff;
-    }
-
-    .hero .btn {
-        border-radius: 30px;
-        padding: 12px 25px;
+    .btn-hero {
+        background: var(--secondary-color);
+        padding: 14px 40px;
+        border-radius: 50px;
         font-weight: 700;
-        margin-top: 20px;
-        background: #ff9900; /* Amazon-style warm orange */
-        border: none;
-        color: #2b2b2b;
-        transition: all 0.3s;
+        text-decoration: none;
+        color: #000;
     }
 
-        .hero .btn:hover {
-            background: #ffc857;
-            transform: translateY(-3px);
-        }
-
-    /* ===== PRODUCTS SECTION ===== */
-    .products-section {
-        max-width: 1200px;
-        margin: 0 auto 50px;
-        padding: 30px;
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
-    }
-
-    .section-title {
-        font-size: 1.7rem;
-        font-weight: 800;
-        color: #ff9900; /* orange accent */
-        margin: 25px 0 15px;
-        border-left: 5px solid #ffc857; /* light gold border */
-        padding-left: 10px;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
+    /* PRODUCT CARD */
     .product-card {
-        border-radius: 16px;
-        transition: all .3s ease;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
         height: 100%;
-        background: #fff; /* white product card */
-        color: #2b2b2b;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .img-wrapper {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
         position: relative;
     }
-
-        .product-card:hover {
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-        }
 
     .product-img {
-        height: 200px;
-        object-fit: cover;
-        border-radius: 14px;
-        transition: all 0.3s;
-    }
-
-        .product-img:hover {
-            transform: scale(1.05);
-        }
-
-    .price {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #b12704; /* red price */
-    }
-
-    .old-price {
-        text-decoration: line-through;
-        color: #565959;
-        margin-left: 5px;
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
     }
 
     .discount-badge {
+        color: white;
+        font-size: 0.75rem;
+        padding: 5px 10px;
+        border-radius: 4px;
         position: absolute;
-        top: 12px;
-        left: 12px;
-        background: #007600; /* green discount badge */
-        color: #fff;
-        padding: 4px 10px;
-        font-size: 12px;
-        border-radius: 20px;
+        top: 0;
+        left: 0;
+        font-weight: 600;
     }
 
-    .btn-rounded {
-        border-radius: 30px;
-        transition: all 0.3s;
+    .badge-discount {
+        background: var(--danger);
     }
 
-        .btn-rounded:hover {
-            transform: translateY(-2px);
-        }
-
-    /* ===== RESPONSIVE ===== */
-    @@media (max-width: 768px) {
-        .hero h1 {
-            font-size: 2rem;
-        }
-
-        .hero p {
-            font-size: 1rem;
-        }
-
-        .products-section {
-            padding: 15px;
-        }
-
-        .product-img {
-            height: 180px;
-        }
+    .badge-out {
+        background: #232f3e; /* STEP 4: Dark badge for Out of Stock */
     }
+
+    .product-name {
+        font-weight: 600;
+        margin-bottom: 10px;
+        height: 40px;
+        overflow: hidden;
+        color: var(--text-main);
+    }
+
+    .price-current {
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .price-old {
+        text-decoration: line-through;
+        color: var(--text-muted);
+        margin-left: 6px;
+    }
+
+    .card-footer-custom {
+        margin-top: auto;
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-view {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: black;
+        border-radius: 6px;
+    }
+
+    .btn-add-cart {
+        background: var(--secondary-color);
+        padding: 8px;
+        text-align: center;
+        text-decoration: none;
+        color: black;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
 </style>
 
-@* <!-- ===== HERO SECTION ===== -->
-<div class="hero">
-    <h1>Welcome to EC Shop!</h1>
-    <p>Discover the best deals and latest arrivals.</p>
-    <a asp-controller="Account" asp-action="Product" class="btn btn-lg">
-        Start Shopping
-    </a>
-</div> *@
+<div class="hero-container">
+    <div class="hero-content">
+        <h1>Welcome to EC Shop</h1>
+        <p>Your one-stop destination for the latest products.</p>
+        <a asp-controller="Product" asp-action="Index" class="btn-hero">
+            Explore Products
+        </a>
+    </div>
+</div>
 
-<!-- ===== PRODUCTS SECTION ===== -->
-<div class="products-section">
+<div class="container pb-5">
+
     @if (Model == null || !Model.Any())
     {
-        <div class="alert alert-warning text-dark">
-            No products available right now.
+        <div class="text-center bg-white p-5 rounded shadow-sm">
+            <h3>No products available</h3>
         </div>
     }
     else
     {
-        <!-- BEST DEALS -->
-        <div class="mb-4">
-            <h4 class="section-title">Best Deals</h4>
-            <div class="row g-4">
-                @foreach (var p in Model.Take(6))
-                {
-                    var discount = 15;
-                    var oldPrice = p.Price + (p.Price * discount / 100);
+        <div class="row g-4">
+            @foreach (var p in Model)
+            {
+                var discount = 15;
+                var oldPrice = p.Price + (p.Price * discount / 100);
+                bool isOutOfStock = p.Quantity <= 0;
 
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card product-card p-3 text-center">
-                            <span class="discount-badge">@discount% OFF</span>
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                    <div class="product-card">
+
+                        <div class="img-wrapper">
+
+                            @if (isOutOfStock)
+                            {
+                                <span class="discount-badge badge-out">
+                                    OUT OF STOCK
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="discount-badge badge-discount">
+                                    @discount% OFF
+                                </span>
+                            }
+
                             <img src="@Url.Content("~/images/products/" + p.Image)"
-                                 class="product-img mb-3"
-                                 alt="@p.Name" />
-
-
-                            <h6 class="fw-semibold">@p.Name</h6>
-                            <p>
-                                <span class="price">₹@p.Price</span>
-                                <span class="old-price">₹@oldPrice</span>
-                            </p>
-                            <div class="d-grid gap-2">
-                                <a asp-controller="Product"asp-action="Details"asp-route-id="@p.Id"
-                                   class="btn btn-outline-primary btn-sm btn-rounded">
-                                    View
-                                </a>
-
-                                <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"
-                                   class="btn btn-success btn-sm btn-rounded">
-                                    Add to Cart
-                                </a>
-                            </div>
+                                 alt="@p.Name"
+                                 class="product-img"
+                                 onerror="this.src='https://via.placeholder.com/250?text=Product'" />
                         </div>
-                    </div>
-                }
-            </div>
-        </div>
 
-        <!-- NEW ARRIVALS -->
-        <div class="mb-4">
-            <h4 class="section-title">New Arrivals</h4>
-            <div class="row g-4">
-                @foreach (var p in Model.Skip(6).Take(6))
-                {
-                    var discount = 10;
-                    var oldPrice = p.Price + (p.Price * discount / 100);
+                        <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">
+                            <div class="product-name">@p.Name</div>
+                        </a>
 
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card product-card p-3 text-center">
-                            <span class="discount-badge">@discount% OFF</span>
-                            <img src="@p.Image" class="product-img mb-3" />
-                            <h6 class="fw-semibold">@p.Name</h6>
-                            <p>
-                                <span class="price">₹@p.Price</span>
-                                <span class="old-price">₹@oldPrice</span>
-                            </p>
-                            <div class="d-grid gap-2">
-                                <a asp-controller="Product"asp-action="Details"asp-route-id="@p.Id"class="btn btn-outline-primary btn-sm btn-rounded">
-                                    View
-                                </a>
+                        <div class="card-footer-custom">
 
-                                <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"class="btn btn-success btn-sm btn-rounded">
-                                    Add to Cart
-                                </a>
+                            <div>
+                                <span class="price-current">₹@p.Price</span>
+                                <span class="price-old">₹@oldPrice</span>
                             </div>
+
+                            @if (isOutOfStock)
+                            {
+                                <div class="text-danger fw-bold mt-1">
+                                    Out of Stock
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-success fw-bold mt-1">
+                                    In Stock (@p.Quantity left)
+                                </div>
+                            }
+
+                            <div class="action-buttons">
+
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="btn-view">
+                                    Details
+                                </a>
+
+                                @if (isOutOfStock)
+                                {
+                                    <button class="btn-add-cart"disabled    style="background:#ccc;cursor:not-allowed;">
+                                        Out of Stock
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"class="btn-add-cart">
+                                        Add to Cart
+                                    </a>
+                                }
+
+                            </div>
+
                         </div>
+
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
     }
+
 </div>

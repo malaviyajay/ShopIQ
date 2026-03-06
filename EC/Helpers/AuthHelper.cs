@@ -19,6 +19,24 @@ public static class AuthHelper
         return context.User.IsInRole("Admin");
     }
 
+    public static bool IsSeller(this HttpContext context)
+    {
+        if (!context.IsLoggedIn())
+        {
+            return false;
+        }
+        return context.User.IsInRole("Seller");
+    }
+
+    public static bool IsCustomer(this HttpContext context)
+    {
+        if (!context.IsLoggedIn())
+        {
+            return false;
+        }
+        return context.User.IsInRole("Customer");
+    }
+
     public static int? UserId(this HttpContext context)
     {
         if (!context.IsLoggedIn())
@@ -31,6 +49,20 @@ public static class AuthHelper
             return null;
         }
         return userId;
+    }
+
+    public static int? RoleId(this HttpContext context)
+    {
+        if (!context.IsLoggedIn())
+        {
+            return null;
+        }
+
+        if (!int.TryParse(context.User.FindFirst("RoleId")?.Value ?? null, out int RoleId))
+        {
+            return null;
+        }
+        return RoleId;
     }
 
     public static string? UserName(this HttpContext context)

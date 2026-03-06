@@ -1,218 +1,328 @@
 ﻿@model List<EC.Models.Product>
 @{
-    ViewData["Title"] = "Products";
+    ViewData["Title"] = "Manage Products";
     Layout = "_Layout";
 }
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 <style>
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --border-color: #e7e7e7;
+        --danger: #d13212;
+    }
+
     body {
-        background: #f3f4f6;
+        background: var(--bg-light);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-main);
     }
 
+    /* PAGE WRAPPER */
     .products-container {
-        padding: 40px 30px;
-        max-width: 1200px;
+        max-width: 1300px;
         margin: 0 auto;
+        padding: 40px 15px;
     }
 
-    .products-header {
+    /* HEADER */
+    .dashboard-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
         gap: 15px;
     }
 
-        .products-header h3 {
-            font-size: 26px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0;
-        }
+    .dash-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
     .btn-add {
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 12px;
+        background: var(--secondary-color);
+        border: 1px solid transparent;
+        color: var(--text-main);
         font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
-        transition: all 0.25s ease-in-out;
+        padding: 10px 20px;
+        border-radius: 8px;
         text-decoration: none;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(213,217,217,0.5);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
 
         .btn-add:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(99, 102, 241, 0.45);
-            opacity: 0.95;
+            background: var(--secondary-hover);
+            color: var(--text-main);
+            transform: translateY(-1px);
         }
 
+    /* CARD CONTAINER */
     .products-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+        background: var(--white);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
     }
 
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 8px;
-        margin-bottom: 0;
+    /* SEARCH BAR */
+    .search-container {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--white);
     }
 
-        .table thead {
-            background: #f9fafb;
+    .search-box {
+        position: relative;
+        max-width: 400px;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
         }
 
-            .table thead th {
-                font-weight: 600;
-                color: #374151;
-                padding: 16px 14px;
-                border-bottom: none;
-                text-align: left;
-                font-size: 14px;
+        .search-box input {
+            width: 100%;
+            border: 1px solid #d5d9d9;
+            padding: 10px 15px 10px 40px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(213,217,217,0.2) inset;
+        }
+
+            .search-box input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(0, 113, 133, 0.15);
+                outline: none;
             }
 
-        .table tbody td {
-            padding: 14px 14px;
-            vertical-align: middle;
-            background: #ffffff;
-            border-radius: 12px;
-            color: #374151;
-            font-size: 14px;
+    /* TABLE */
+    .table-responsive {
+        padding: 0 25px 25px 25px;
+    }
+
+    .admin-table {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+        .admin-table th {
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 10px;
         }
 
-        .table tbody tr:hover td {
-            background: #f3f4f6;
-            transition: background 0.2s;
+        .admin-table td {
+            vertical-align: middle;
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-main);
         }
+
+        .admin-table tr:hover td {
+            background-color: var(--bg-light);
+        }
+
+    .product-name {
+        font-weight: 600;
+        color: var(--text-main);
+    }
 
     .price-badge {
-        background: #ecfeff;
-        color: #0369a1;
-        padding: 6px 14px;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 14px;
+        font-weight: 700;
+        color: #B12704;
     }
 
-    .action-btns a {
-        font-size: 14px;
+    .category-badge {
+        background: var(--bg-light);
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+    }
+
+    /* ACTION BUTTONS */
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
         font-weight: 600;
-        padding: 8px 16px;
-        border-radius: 12px;
         text-decoration: none;
-        display: inline-block;
-        transition: all 0.25s ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
     }
 
-        .action-btns a.edit {
-            background: linear-gradient(135deg, #facc15, #eab308);
-            color: #1f2937;
-            margin-right: 8px;
-            box-shadow: 0 4px 14px rgba(250,204,21,0.3);
+    .edit-btn {
+        background: transparent;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+        .edit-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
         }
 
-        .action-btns a.delete {
-            background: linear-gradient(135deg, #ef4444, #b91c1c);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(239,68,68,0.3);
+    .delete-btn {
+        background: transparent;
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: var(--white);
         }
 
+    /* BACK BTN */
     .btn-back {
-        background: linear-gradient(135deg, #6b5dfc, #5145cd);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 24px;
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 50px;
         font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
-        cursor: pointer;
         margin-top: 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
     }
 
-    /* ✅ FIXED MEDIA QUERY */
-    @@media (max-width: 768px) {
-        .products-header {
-            flex-direction: column;
+        .btn-back:hover {
+            background: var(--white);
+            border-color: #d1d1d1;
         }
 
-        .btn-add, .btn-back {
-            width: 100%;
-            text-align: center;
-        }
-    }
 </style>
-
 
 <div class="products-container">
 
-    <div class="products-header">
-        <h3>Product List</h3>
-
-        <a href="/Admin/Add" class="btn-add">+ Add New Product</a>
+    <div class="dashboard-header">
+        <h1 class="dash-title"><i class="fas fa-boxes text-primary"></i> Inventory Management</h1>
+        <a href="/Admin/Add" class="btn-add"><i class="fas fa-plus"></i> Add New Product</a>
     </div>
-
 
     <div class="products-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th style="width:180px">Action</th>
-                </tr>
-            </thead>
 
-            <tbody id="productTable">
-                @foreach (var p in Model)
-                {
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input id="productSearch" type="text" placeholder="Search by product name or category..." />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td>@p.Name</td>
-                        <td><span class="price-badge">₹@p.Price</span></td>
-                        <td>@p.CategoryName</td>
-                        <td class="action-btns">
-                            <a href="/Admin/Edit/@p.Id" class="edit">Edit</a>
-                            <a href="/Admin/Delete/@p.Id" class="delete"
-                               onclick="return confirm('Delete this product?')">Delete</a>
-                        </td>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th style="width: 180px;">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="productTable">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-5">
+                                <i class="fas fa-box-open fa-2x mb-2" style="opacity: 0.5;"></i>
+                                <p class="mb-0">No products found in inventory.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var p in Model)
+                        {
+                            <tr>
+                                <td class="product-name">@p.Name</td>
+                                <td>
+                                    <span class="price-badge">₹@p.Price</span>
+                                </td>
+                                <td>
+                                    <span class="category-badge">@p.Category</span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <a href="/Admin/Edit/@p.Id" class="btn-action edit-btn">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/Admin/Delete/@p.Id" class="btn-action delete-btn"
+                                           onclick="return confirm('Are you sure you want to delete \'@p.Name\'? This action cannot be undone.')">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
 
-        <button type="button" class="btn-back" onclick="history.back();">
-            ← Go Back
-        </button>
     </div>
+
+    <button type="button" class="btn-back" onclick="history.back();">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
 
 </div>
 
-
-<!-- ✅ WORKING SEARCH SCRIPT -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-
         const input = document.getElementById("productSearch");
         const rows = document.querySelectorAll("#productTable tr");
 
         input.addEventListener("keyup", function () {
-
             let filter = input.value.toLowerCase();
 
             rows.forEach(row => {
+                // Skip the "No products found" row if it exists
+                if(row.cells.length === 1) return;
+
                 let text = row.innerText.toLowerCase();
-
-                row.style.display = text.includes(filter)
-                    ? ""
-                    : "none";
+                row.style.display = text.includes(filter) ? "" : "none";
             });
-
         });
-
     });
 </script>

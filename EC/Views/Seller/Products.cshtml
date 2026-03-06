@@ -1,0 +1,330 @@
+﻿@model List<EC.Models.Product>
+@{
+    ViewData["Title"] = "Manage Products";
+    Layout = "_Layout";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --border-color: #e7e7e7;
+        --danger: #d13212;
+    }
+
+    body {
+        background: var(--bg-light);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-main);
+    }
+
+    /* PAGE WRAPPER */
+    .products-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 40px 15px;
+    }
+
+    /* HEADER */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .dash-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-add {
+        background: var(--secondary-color);
+        border: 1px solid transparent;
+        color: var(--text-main);
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(213,217,217,0.5);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-add:hover {
+            background: var(--secondary-hover);
+            color: var(--text-main);
+            transform: translateY(-1px);
+        }
+
+    /* CARD CONTAINER */
+    .products-card {
+        background: var(--white);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--white);
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 400px;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-box input {
+            width: 100%;
+            border: 1px solid #d5d9d9;
+            padding: 10px 15px 10px 40px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(213,217,217,0.2) inset;
+        }
+
+            .search-box input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(0, 113, 133, 0.15);
+                outline: none;
+            }
+
+    /* TABLE */
+    .table-responsive {
+        padding: 0 25px 25px 25px;
+    }
+
+    .Seller-table {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+        .Seller-table th {
+            background: transparent;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 10px;
+        }
+
+        .Seller-table td {
+            vertical-align: middle;
+            padding: 15px 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+    .adSeller-table tr:hover td {
+            background-color: var(--bg-light);
+        }
+
+    .product-name {
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    .price-badge {
+        font-weight: 700;
+        color: #B12704;
+    }
+
+    .category-badge {
+        background: var(--bg-light);
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+    }
+
+    /* ACTION BUTTONS */
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+
+    .edit-btn {
+        background: transparent;
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+        .edit-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+    .delete-btn {
+        background: transparent;
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+    /* BACK BTN */
+    .btn-back {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-top: 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+        .btn-back:hover {
+            background: var(--white);
+            border-color: #d1d1d1;
+        }
+
+</style>
+
+<div class="products-container">
+
+    <div class="dashboard-header">
+        <h1 class="dash-title"><i class="fas fa-boxes text-primary"></i> Inventory Management</h1>
+        <a asp-controller="Seller" asp-action="Add" class="btn-add">
+            <i class="fas fa-plus"></i> Add New Product
+        </a>
+    </div>
+
+    <div class="products-card">
+
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input id="productSearch" type="text" placeholder="Search by product name or category..." />
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="Seller-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTable">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-5">
+                                <i class="fas fa-box-open fa-2x mb-2" style="opacity: 0.5;"></i>
+                                <p class="mb-0">No products found in inventory.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var p in Model)
+                        {
+                            <tr>
+                                <td class="product-name">@p.Name</td>
+                                <td>
+                                    <span class="price-badge">₹@p.Price</span>
+                                </td>
+                                <td>
+                                    <span class="category-badge">@p.Category</span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <a href="/Seller/Edit/@p.Id" class="btn-action edit-btn">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/Seller/Delete/@p.Id" class="btn-action delete-btn"
+                                           onclick="return confirm('Are you sure you want to delete \'@p.Name\'? This action cannot be undone.')">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <button type="button" class="btn-back" onclick="history.back();">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("productSearch");
+        const rows = document.querySelectorAll("#productTable tr");
+
+        input.addEventListener("keyup", function () {
+            let filter = input.value.toLowerCase();
+
+            rows.forEach(row => {
+                // Skip the "No products found" row if it exists
+                if(row.cells.length === 1) return;
+
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? "" : "none";
+            });
+        });
+    });
+</script>

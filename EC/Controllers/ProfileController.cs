@@ -18,18 +18,13 @@ public class ProfileController : Controller
 
     private int GetUserId()
     {
-
         return HttpContext.UserId() ?? 0;
     }
 
     // ================= PROFILE VIEW =================
     public IActionResult Index()
     {
-
         var profile = _db.GetUserProfile(GetUserId());
-        if (profile == null)
-            profile = new User();
-
         return View(profile);
     }
 
@@ -37,43 +32,28 @@ public class ProfileController : Controller
     [HttpGet]
     public IActionResult Edit()
     {
-        int userId = GetUserId();
-        var user = _db.GetUserProfile(userId);
+        var user = _db.GetUserProfile(GetUserId());
 
         if (user == null)
-        {
             return NotFound();
-        }
 
         return View(user);
     }
 
-
     // ================= SAVE EDIT =================
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Edit(User model)
     {
         if (!ModelState.IsValid)
-        {
-            return View(model); 
-        }
+            return View(model);
 
-        var user = _db.GetUserProfile(model.Id);
-        if (user == null)
-        {
-            return NotFound();
-        }
 
-        user.Name = model.Name;
-        user.Email = model.Email;
-        user.Phone = model.Phone;
-        user.Address = model.Address;
+        model.Id = GetUserId();
 
-        _db.UpdateUser(user); 
+        _db.SaveUserProfile(model);
 
         TempData["Success"] = "Profile updated successfully!";
-        return RedirectToAction("Profile"); 
+        return RedirectToAction("Index");
     }
 }

@@ -1,0 +1,32 @@
+﻿@model List<EC.Models.Order>
+
+<h2>My Orders</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Date</th>
+            <th class="text-end">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.UserName</td>
+                    <td>@o.OrderDate.ToString("dd MMM yyyy")</td>
+                    <td class="text-end">₹@o.TotalAmount.ToString("N0")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center">No Orders Found</td>
+            </tr>
+        }
+    </tbody>
+</table>

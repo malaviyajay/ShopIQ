@@ -5,69 +5,146 @@
 }
 
 <style>
-    .checkout-container {
-        max-width: 1000px;
-        margin: auto;
+    /* ===== Modern Premium Checkout Theme ===== */
+    body {
+        background: #f8fafc; /* Matches Layout */
+    }
+
+    .checkout-wrap {
+        padding: 40px 0;
     }
 
     .checkout-card {
+        background: #fff;
         border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        overflow: hidden;
-    }
-
-    .checkout-header {
-        background: linear-gradient(135deg, #0d6efd, #0a58ca);
-        color: #fff;
-        padding: 18px;
-        font-size: 1.2rem;
-        font-weight: 600;
-        text-align: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        padding: 24px;
+        margin-bottom: 24px;
     }
 
     .section-title {
         font-weight: 700;
-        margin-bottom: 10px;
         font-size: 1.1rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        color: #1e293b;
     }
 
-    .checkout-box {
-        padding: 20px;
-    }
+        .section-title i {
+            margin-right: 10px;
+            color: #6366f1;
+        }
 
-    .order-summary {
-        background: #f8f9fa;
+    /* Custom Radio Buttons */
+    .payment-option {
+        border: 2px solid #f1f5f9;
         border-radius: 12px;
-        padding: 20px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+        .payment-option:hover {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+        }
+
+        /* Target the radio input when checked */
+        .payment-option input[type="radio"]:checked + label {
+            color: #6366f1;
+        }
+
+        .payment-option:has(input[type="radio"]:checked) {
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+    /* ===== Order Summary Side ===== */
+    .summary-box {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 100px;
     }
 
     .summary-line {
         display: flex;
         justify-content: space-between;
-        padding: 8px 0;
+        margin-bottom: 12px;
         font-size: 0.95rem;
+        color: #64748b;
     }
 
-    .grand-total {
-        font-size: 1.4rem;
+    .grand-total-label {
+        font-size: 1.1rem;
         font-weight: 700;
-        color: #198754;
+        color: #0f172a;
+    }
+
+    .grand-total-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #6366f1;
     }
 
     .place-btn {
-        border-radius: 30px;
-        padding: 12px;
-        font-size: 1.05rem;
+        background: #6366f1;
+        border: none;
+        color: #fff;
+        font-weight: 600;
+        padding: 14px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
     }
+
+        .place-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            color: #fff;
+        }
+
+    .secure-badge {
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: center;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .item-row {
+        padding: 8px 0;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+        .item-row:last-of-type {
+            border-bottom: none;
+        }
 </style>
 
-<div class="container mt-4 checkout-container">
+<div class="container checkout-wrap">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-800" style="letter-spacing: -1px;">Secure Checkout</h2>
+            <p class="text-muted">Review your items and select a payment method.</p>
+        </div>
+    </div>
 
     <form asp-action="PlaceOrder" method="post">
-
         @Html.AntiForgeryToken()
 
-        <!-- Hidden values for binding -->
         <input type="hidden" asp-for="UserId" />
         <input type="hidden" asp-for="UserName" />
         <input type="hidden" asp-for="TotalAmount" />
@@ -80,115 +157,77 @@
             <input type="hidden" asp-for="Items[i].Price" />
         }
 
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a asp-controller="Home" asp-action="Index">Home</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a asp-controller="Cart" asp-action="Index">Cart</a>
-                </li>
-                <li class="breadcrumb-item active">Checkout</li>
-            </ol>
-        </nav>
+        <div class="row">
 
-        <div class="checkout-card">
+            <div class="col-lg-8">
 
-            <div class="checkout-header">
-                🔒 Secure Checkout
-            </div>
+                <div class="checkout-card">
+                    <div class="section-title">
+                        <i class="bi bi-credit-card-2-front-fill"></i> Payment Method
+                    </div>
 
-            <div class="row checkout-box">
+                    <div class="payment-option">
+                        <input type="radio" asp-for="PaymentMethod" value="COD" id="payCOD" checked class="form-check-input" />
+                        <label for="payCOD" class="ms-3 mb-0 pointer-event fw-bold text-dark">
+                            Cash on Delivery
+                            <small class="d-block text-muted fw-normal">Pay when your package arrives.</small>
+                        </label>
+                    </div>
 
-                <!-- LEFT -->
-                <div class="col-md-7">
-                    <div class="section-title">Payment Method</div>
-
-                    <div class="card p-3">
-
-                        <!-- Proper model binding -->
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   asp-for="PaymentMethod"
-                                   value="COD"
-                                   checked>
-
-                            <label class="form-check-label">
-                                Cash on Delivery
-                            </label>
-                        </div>
-
-                        <div class="form-check mt-2">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   asp-for="PaymentMethod"
-                                   value="Online">
-
-                            <label class="form-check-label">
-                                Online Payment
-                            </label>
-                        </div>
-
+                    <div class="payment-option">
+                        <input type="radio" asp-for="PaymentMethod" value="Online" id="payOnline" class="form-check-input" />
+                        <label for="payOnline" class="ms-3 mb-0 pointer-event fw-bold text-dark">
+                            Online Payment
+                            <small class="d-block text-muted fw-normal">Secure payment via Credit Card/UPI.</small>
+                        </label>
                     </div>
                 </div>
 
-                <!-- RIGHT -->
-                <div class="col-md-5">
-                    <div class="order-summary">
+                <button type="button" class="btn btn-link text-decoration-none text-secondary fw-semibold"
+                        onclick="history.back();">
+                    <i class="bi bi-arrow-left me-2"></i> Return to Cart
+                </button>
 
-                        <div class="section-title">Order Summary</div>
+            </div>
 
+
+            <div class="col-lg-4">
+
+                <div class="summary-box">
+                    <div class="section-title">
+                        <i class="bi bi-receipt"></i> Order Summary
+                    </div>
+
+                    <div class="mb-3">
                         @foreach (var item in Model.Items)
                         {
-                            <div class="summary-line">
-                                <span>@item.ProductName</span>
-                                <span>
-                                    @item.Quantity × ₹@item.Price =
-                                    ₹@(item.Quantity* item.Price)
-                                </span>
+                            <div class="summary-line item-row">
+                                <span class="text-dark fw-medium">@item.ProductName <small class="text-muted">×@item.Quantity</small></span>
+                                <span class="fw-semibold">₹@(item.Price* item.Quantity)</span>
                             </div>
                         }
+                    </div>
 
-                        <hr />
+                    <div class="summary-line mt-4">
+                        <span class="grand-total-label">Grand Total</span>
+                        <span class="grand-total-price">₹@Model.TotalAmount</span>
+                    </div>
 
-                        <div class="summary-line">
-                            <span>Subtotal</span>
-                            <span>₹ @Model.TotalAmount</span>
-                        </div>
+                    <button type="submit" class="btn w-100 place-btn mt-4">
+                        Place Order <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
 
-                        <div class="summary-line">
-                            <span>Shipping</span>
-                            <span>₹ 0 (Free)</span>
-                        </div>
-
-                        <div class="summary-line">
-                            <span>Tax</span>
-                            <span>₹ 0</span>
-                        </div>
-
-                        <hr/>
-
-                        <div class="summary-line">
-                            <span class="fw-bold">Total</span>
-                            <span class="grand-total">
-                                ₹ @Model.TotalAmount
-                            </span>
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-success w-100 place-btn mt-3">
-                            Place Order
-                        </button>
-
-                        <p class="text-muted text-center mt-3">
-                            🔒 Secure payment protected by SSL
-                        </p>
-
+                    <div class="secure-badge">
+                        <i class="bi bi-shield-lock-fill"></i> End-to-end encrypted transaction
                     </div>
                 </div>
 
+                <div class="mt-3 p-3 text-center" style="background: rgba(99, 102, 241, 0.05); border-radius: 12px; border: 1px dashed #6366f1;">
+                    <small class="text-primary fw-bold">Free Shipping Applied!</small>
+                </div>
+
             </div>
+
         </div>
 
     </form>

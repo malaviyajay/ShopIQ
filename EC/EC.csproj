@@ -4,12 +4,23 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>8052d882-65b3-4188-9b69-5bc6880d4dd0</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AspCore.Authentication" Version="5.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="10.0.2" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="MailKit" Version="4.15.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="10.0.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
+    <PackageReference Include="MimeKit" Version="4.15.1" />
+    <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
+    <PackageReference Include="Stripe.net" Version="50.4.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Text.Json" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>

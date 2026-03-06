@@ -1,7 +1,36 @@
-﻿<div class="container mt-5">
-    <div class="alert alert-success">
-        <h3>Order Placed Successfully!</h3>
-        <p>Thank you for shopping with us.</p>
-        <a class="btn btn-primary" href="/Home/Index">Continue Shopping</a>
+﻿@{
+    ViewBag.Title = "Order Success";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-success text-center p-5" style="border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,0.1);">
+        <h2 class="mb-3">🎉 Order Placed Successfully!</h2>
+        <p class="mb-4">Thank you for shopping with us. Your order is now confirmed.</p>
+
+        <a class="btn btn-primary btn-lg me-2" href="/Home/Index">
+            Continue Shopping
+        </a>
+
+        <a class="btn btn-outline-secondary btn-lg" href="/Order/Index">
+            View My Orders
+        </a>
     </div>
 </div>
+
+<style>
+    .alert-success h2 {
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .alert-success p {
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .btn-lg {
+        padding: 12px 28px;
+        font-size: 1.1rem;
+        border-radius: 30px;
+    }
+</style>

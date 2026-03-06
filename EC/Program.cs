@@ -1,26 +1,27 @@
 ﻿using EC.Data;
+using EC.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
 builder.Services.AddScoped<DbHelper>();
+builder.Services.AddScoped<EmailHelper>();
 
-// Controllers with Views
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession();
 
-// Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; // ✅ FIXED
+        options.LoginPath = "/Account/Login";
         options.Cookie.Name = "ECAuthCookie";
         options.AccessDeniedPath = "/Account/AccessDenied";
-        options.AccessDeniedPath = "/Home/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
 
-// Authorization Policies
 builder.Services.AddAuthorization();
 
 builder.Services.AddHttpContextAccessor();
@@ -38,4 +39,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+app.Run(); 

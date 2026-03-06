@@ -1,119 +1,398 @@
-﻿@model List<EC.Models.Order>
+﻿@using EC.Models
+@model List<EC.Models.Order>
 
 @{
     ViewBag.Title = "My Orders";
 }
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 <style>
-    .order-card {
-        border-radius: 14px;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --border-color: #e7e7e7;
+        --success-bg: #d1e7dd;
+        --success-text: #0f5132;
+        --warning-bg: #fff3cd;
+        --warning-text: #856404;
+        --danger-text: #B12704;
+    }
+
+    body {
+        background: var(--bg-light);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-main);
+    }
+
+    .orders-bg {
+        padding: 40px 0;
+        min-height: 80vh;
+    }
+
+    /* ===== DASHBOARD CARD ===== */
+    .dashboard-card {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         overflow: hidden;
     }
 
-    .order-header {
-        background: linear-gradient(135deg, #0d6efd, #0a58ca);
-        color: #fff;
-        padding: 16px;
-        font-size: 1.1rem;
-        font-weight: 600;
+    .card-header-custom {
+        background: var(--white);
+        border-bottom: 1px solid var(--border-color);
+        padding: 25px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .card-header-custom h3 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 0 5px 0;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header-custom p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+    /* ===== TABLE STYLES ===== */
+    .table-wrapper {
+        padding: 20px 30px;
     }
 
     .order-table th {
-        background-color: #f8f9fa;
+        background: transparent;
+        font-size: 0.85rem;
+        font-weight: 600;
         text-transform: uppercase;
-        font-size: 13px;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--border-color);
+        padding: 15px 10px;
+    }
+
+    .order-table td {
+        vertical-align: middle;
+        padding: 18px 10px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
     }
 
     .order-id {
-        font-weight: 600;
-        color: #0d6efd;
+        font-weight: 700;
+        color: var(--primary-color);
     }
 
     .order-total {
-        font-weight: 600;
-        color: #198754;
+        font-weight: 700;
+        color: var(--danger-text);
+        font-size: 1.1rem;
     }
 
+    .price-symbol {
+        font-size: 0.85rem;
+        vertical-align: top;
+        position: relative;
+        top: 2px;
+    }
+
+    /* ===== STATUS BADGES ===== */
     .order-status {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
 
     .status-pending {
-        background: #fff3cd;
-        color: #856404;
+        background: var(--warning-bg);
+        color: var(--warning-text);
     }
 
     .status-complete {
-        background: #d1e7dd;
-        color: #0f5132;
+        background: var(--success-bg);
+        color: var(--success-text);
     }
+
+    /* ===== VIEW BUTTON ===== */
+    .btn-view {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 8px 16px;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(213,217,217,0.3);
+    }
+
+        .btn-view:hover {
+            background: var(--bg-light);
+            border-color: #d1d1d1;
+            color: var(--primary-color);
+        }
+
+    /* ===== MODAL ===== */
+    .glass-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(5px);
+        background: rgba(15, 17, 17, 0.4); /* Darker Amazon-style overlay */
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+        .glass-modal.show {
+            opacity: 1;
+        }
+
+    .modal-card {
+        background: var(--white);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 550px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+    }
+
+    .glass-modal.show .modal-card {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding: 20px 25px;
+        background: var(--white);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+    .close-btn {
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        background: var(--bg-light);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+        .close-btn:hover {
+            background: #fdf3f5;
+            color: var(--danger-text);
+        }
+
+    .modal-body-content {
+        padding: 25px;
+    }
+
+    .modal-card::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-card::-webkit-scrollbar-thumb {
+        background: #d5d9d9;
+        border-radius: 3px;
+    }
+
 </style>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+<div class="orders-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
 
-            <div class="order-card">
-                <div class="order-header">
-                    🧾 My Order History
-                </div>
+                <div class="dashboard-card">
 
-                <div class="table-responsive p-3">
-
-                    @if (!Model.Any())
-                    {
-                        <div class="alert alert-info text-center">
-                            You have not placed any orders yet.
+                    <div class="card-header-custom">
+                        <div>
+                            <h3><i class="fas fa-box text-primary"></i> Your Orders</h3>
+                            <p>Track, return, or buy things again.</p>
                         </div>
-                    }
-                    else
-                    {
-                        <table class="table table-hover order-table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Total Amount</th>
-                                    <th>Order Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
+                        <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary rounded-pill fw-semibold text-decoration-none small">
+                            Continue Shopping
+                        </a>
+                    </div>
 
-                            <tbody>
-                                @foreach (var o in Model)
-                                {
-                                    <tr>
-                                        <td class="order-id">#@o.Id</td>
+                    <div class="table-wrapper">
 
-                                        <td class="order-total">
-                                            ₹@o.TotalAmount
-                                        </td>
+                        @if (!Model.Any())
+                        {
+                            <div class="text-center py-5">
+                                <i class="fas fa-box-open fa-3x text-muted mb-3" style="opacity: 0.5;"></i>
+                                <h5 class="fw-bold">You haven't placed any orders yet.</h5>
+                                <p class="text-muted">Looks like you haven't made your choice yet. Let's find something amazing!</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table order-table align-middle mb-0">
 
-                                        <td>
-                                            @o.OrderDate.ToString("dd MMM yyyy")
-                                        </td>
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Date Placed</th>
+                                            <th>Total Amount</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
 
-                                        <td>
-                                            <span class="order-status
-                                                        @(o.Status == "Completed"? "status-complete" : "status-pending")"> @o.Status
-                                            </span>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
+                                    <tbody>
+                                        @foreach (var o in Model)
+                                        {
+                                            <tr>
+                                                <td class="order-id">#@o.Id</td>
 
+                                                <td>
+                                                    <i class="far fa-calendar-alt text-muted me-1"></i>
+                                                    @o.OrderDate.ToString("dd MMM yyyy")
+                                                </td>
+
+                                                <td class="order-total">
+                                                    <span class="price-symbol">₹</span>@o.TotalAmount
+                                                </td>
+
+                                                <td>
+                                                    @if (o.Status == "Completed" || o.Status == "Delivered")
+                                                    {
+                                                        <span class="order-status status-complete">
+                                                            <i class="fas fa-check-circle"></i> @o.Status
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="order-status status-pending">
+                                                            <i class="fas fa-clock"></i> @o.Status
+                                                        </span>
+                                                    }
+                                                </td>
+
+                                                <td class="text-end">
+                                                    <button class="btn-view" onclick="showOrderDetails(@o.Id, 'user')">
+                                                        <i class="fas fa-file-invoice me-1"></i> View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        }
+
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
 </div>
 
+<div id="glassModal" class="glass-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><i class="fas fa-receipt text-primary me-2"></i> Order Details</h3>
+            <span class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></span>
+        </div>
+        <div id="modalBody" class="modal-body-content">
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                <p>Loading order details...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    function showOrderDetails(orderId, type) {
+        // Show modal with loading state first
+        const modal = document.getElementById("glassModal");
+        const modalBody = document.getElementById("modalBody");
 
-                                            
+        modalBody.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-circle-notch fa-spin fa-2x mb-2" style="color: var(--primary-color);"></i>
+                <p>Fetching your order...</p>
+            </div>`;
+
+        modal.style.display = "flex";
+        // Small timeout to allow display:flex to apply before adding opacity class for smooth animation
+        setTimeout(() => modal.classList.add("show"), 10);
+
+        let url = type === 'user' ? '/Order/GetOrderDetails?id=' : '/Order/GetOrderDetails?id=';
+
+        fetch(url + encodeURIComponent(orderId))
+            .then(res => res.text())
+            .then(html => {
+                modalBody.innerHTML = html;
+            })
+            .catch(err => {
+                modalBody.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                        <h6 class="fw-bold text-danger">Failed to load order details.</h6>
+                        <p class="text-muted small">Please check your connection and try again.</p>
+                    </div>`;
+            });
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("glassModal");
+        modal.classList.remove("show");
+        // Wait for CSS transition to finish before hiding
+        setTimeout(() => modal.style.display = "none", 300);
+    }
+
+    // Close modal if clicked outside the card
+    window.onclick = function(event) {
+        var modal = document.getElementById("glassModal");
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>

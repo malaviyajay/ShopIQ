@@ -10,7 +10,11 @@ namespace EC.Controllers;
 public class CartController : Controller
 {
     private readonly DbHelper _db;
-    public CartController(DbHelper db) => _db = db;
+
+    public CartController(DbHelper db)
+    {
+        _db = db;
+    }
 
     // =================== CART PAGE ===================
     public IActionResult Index()
@@ -20,7 +24,6 @@ public class CartController : Controller
 
         if (!cartItems.Any())
         {
-            ViewBag.Message = "Your cart is empty.";
             ViewBag.CartCount = 0;
             return View(items);
         }
@@ -33,39 +36,92 @@ public class CartController : Controller
             int productId = kv.Key;
             int qty = kv.Value;
 
-            var cmd = new SqlCommand("SELECT * FROM Products WHERE Id=@id", con);
+            using var cmd = new SqlCommand("SELECT * FROM Products WHERE Id=@id", con);
             cmd.Parameters.AddWithValue("@id", productId);
 
             using var rd = cmd.ExecuteReader();
+
             if (rd.Read())
             {
+                int stockQty = rd["Quantity"] == DBNull.Value ? 0 : Convert.ToInt32(rd["Quantity"]);
+
+                // ❗ If product is out of stock, skip it
+                if (stockQty <= 0)
+                {
+                    rd.Close();
+                    continue;
+                }
+
+                // Auto-adjust if cart qty > stock
+                if (qty > stockQty)
+                    qty = stockQty;
+
                 items.Add(new Product
                 {
-                    Id = (int)rd["Id"],
-                    Name = rd["Name"].ToString()!,
-                    Price = (decimal)rd["Price"],
-                    Image = rd["Image"].ToString()!,
-                    CategoryId = (int)rd["CategoryId"],
+                    Id = Convert.ToInt32(rd["Id"]),
+                    Name = rd["Name"]?.ToString() ?? "",
+                    Price = Convert.ToDecimal(rd["Price"]),
+                    Image = rd["Image"]?.ToString() ?? "",
+                    CategoryId = Convert.ToInt32(rd["CategoryId"]),
                     Quantity = qty
                 });
             }
+
+            rd.Close();
         }
 
-        ViewBag.CartCount = cartItems.Sum(x => x.Value);
+        ViewBag.CartCount = items.Sum(x => x.Quantity);
         return View(items);
     }
 
     // =================== ADD TO CART ===================
-    public IActionResult AddToCart(int id)
+    [HttpGet]
+    public IActionResult AddToCart(int id, int quantity = 1)
     {
+        if (quantity <= 0)
+            quantity = 1;
+
+        using var con = _db.GetConnection();
+        con.Open();
+
+        using var cmd = new SqlCommand("SELECT Quantity FROM Products WHERE Id=@id", con);
+        cmd.Parameters.AddWithValue("@id", id);
+
+        var result = cmd.ExecuteScalar();
+
+        if (result == null || result == DBNull.Value)
+        {
+            TempData["Error"] = "Product not found!";
+            return RedirectToAction("Index", "Home");
+        }
+
+        int stockQty = Convert.ToInt32(result);
+
+        // ✅ OUT OF STOCK CHECK
+        if (stockQty <= 0)
+        {
+            TempData["Error"] = "Product is out of stock!";
+            return RedirectToAction("Index", "Home");
+        }
+
         var items = GetCartItems();
+        int existingQty = items.ContainsKey(id) ? items[id] : 0;
+
+        // ✅ STOCK LIMIT CHECK
+        if (existingQty + quantity > stockQty)
+        {
+            TempData["Error"] = $"Only {stockQty} items available in stock!";
+            return RedirectToAction("Index");
+        }
 
         if (items.ContainsKey(id))
-            items[id]++;
+            items[id] += quantity;
         else
-            items[id] = 1;
+            items[id] = quantity;
 
         SaveCartItems(items);
+
+        TempData["Success"] = "Product added to cart!";
         return RedirectToAction("Index");
     }
 
@@ -75,10 +131,41 @@ public class CartController : Controller
     public IActionResult IncreaseQty(int id)
     {
         var items = GetCartItems();
-        if (items.ContainsKey(id))
-            items[id]++;
 
+        if (!items.ContainsKey(id))
+            return RedirectToAction("Index");
+
+        using var con = _db.GetConnection();
+        con.Open();
+
+        using var cmd = new SqlCommand("SELECT Quantity FROM Products WHERE Id=@id", con);
+        cmd.Parameters.AddWithValue("@id", id);
+
+        var result = cmd.ExecuteScalar();
+
+        if (result == null || result == DBNull.Value)
+        {
+            TempData["Error"] = "Product not found!";
+            return RedirectToAction("Index");
+        }
+
+        int stockQty = Convert.ToInt32(result);
+
+        if (stockQty <= 0)
+        {
+            TempData["Error"] = "Product is out of stock!";
+            return RedirectToAction("Index");
+        }
+
+        if (items[id] + 1 > stockQty)
+        {
+            TempData["Error"] = $"Only {stockQty} items available!";
+            return RedirectToAction("Index");
+        }
+
+        items[id]++;
         SaveCartItems(items);
+
         return RedirectToAction("Index");
     }
 
@@ -88,8 +175,14 @@ public class CartController : Controller
     public IActionResult DecreaseQty(int id)
     {
         var items = GetCartItems();
-        if (items.ContainsKey(id) && items[id] > 1)
-            items[id]--;
+
+        if (items.ContainsKey(id))
+        {
+            if (items[id] > 1)
+                items[id]--;
+            else
+                items.Remove(id);
+        }
 
         SaveCartItems(items);
         return RedirectToAction("Index");
@@ -101,6 +194,7 @@ public class CartController : Controller
     public IActionResult RemoveFromCart(int id)
     {
         var items = GetCartItems();
+
         if (items.ContainsKey(id))
             items.Remove(id);
 
@@ -119,7 +213,13 @@ public class CartController : Controller
             foreach (var c in cart.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var parts = c.Split(':');
-                items[int.Parse(parts[0])] = int.Parse(parts[1]);
+
+                if (parts.Length == 2 &&
+                    int.TryParse(parts[0], out int productId) &&
+                    int.TryParse(parts[1], out int qty))
+                {
+                    items[productId] = qty;
+                }
             }
         }
 
@@ -133,11 +233,14 @@ public class CartController : Controller
 
         var options = new CookieOptions
         {
-            Expires = DateTimeOffset.UtcNow.AddDays(7), // persists 7 days
-            Path = "/"
+            Expires = DateTimeOffset.UtcNow.AddDays(7),
+            Path = "/",
+            HttpOnly = true,
+            IsEssential = true
         };
 
         Response.Cookies.Append("Cart", cart, options);
+
         ViewBag.CartCount = items.Sum(x => x.Value);
     }
 }

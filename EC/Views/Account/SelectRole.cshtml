@@ -1,0 +1,21 @@
+﻿@model EC.Models.RoleSelectionViewModel
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-sm">
+        <h3>Select Your Role</h3>
+        <form asp-action="SelectRole" method="post">
+            @foreach (var role in Model.Roles)
+            {
+                <div class="form-check">
+                    <input type="radio"
+                           class="form-check-input"
+                           name="SelectedRole"
+                           value="@role" required />
+                    <label class="form-check-label">@role</label>
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary mt-3">Continue</button>
+        </form>
+    </div>
+</div>

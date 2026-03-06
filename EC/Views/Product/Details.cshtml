@@ -2,105 +2,275 @@
 
 @{
     ViewBag.Title = Model.Name;
+    double avg = ViewBag.AvgRating ?? 0;
+    int total = ViewBag.TotalRatings ?? 0;
+
+    var discount = 15;
+    var oldPrice = Model.Price + (Model.Price * discount / 100);
 }
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 <style>
-    .product-details-card {
-        border-radius: 18px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
-        overflow: hidden;
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --danger: #CC0C39;
+        --success: #007600;
+        --border-color: #e7e7e7;
+    }
+
+    body {
+        background-color: var(--bg-light);
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .product-wrapper {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        height: 100%;
+        min-height: 400px;
     }
 
     .product-image {
-        width: 100%;
-        height: 350px;
-        object-fit: cover;
-        background: #f8f9fa;
+        max-width: 100%;
+        max-height: 450px;
+        object-fit: contain;
+        transition: transform 0.4s ease;
+    }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+    .product-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .rating {
+        color: #f08804;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .divider {
+        border-top: 1px solid var(--border-color);
+        margin: 20px 0;
     }
 
     .price-box {
-        font-size: 1.6rem;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+    .discount-text {
+        color: var(--danger);
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+
+    .price-current {
+        font-size: 2rem;
         font-weight: 700;
-        color: #198754;
     }
 
-    .old-price {
+    .price-symbol {
+        font-size: 1.2rem;
+        vertical-align: top;
+        position: relative;
+        top: 4px;
+        margin-right: 2px;
+    }
+
+    .price-old {
+        color: var(--text-muted);
         text-decoration: line-through;
-        color: #6c757d;
-        font-size: 1rem;
-        margin-left: 10px;
+        font-size: 0.95rem;
+        display: block;
+        margin-bottom: 10px;
     }
 
-    .category-badge {
-        background: #e9ecef;
-        color: #495057;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        display: inline-block;
+    .stock-status {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
     }
 
-    .buy-btn {
-        border-radius: 30px;
-        padding: 12px 25px;
-        font-size: 1.05rem;
+    .stock-in {
+        color: var(--success);
+    }
+
+    .stock-out {
+        color: var(--danger);
+    }
+
+    .section-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+
+    .buy-box {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px 20px;
+        background: var(--white);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        position: sticky;
+        top: 20px;
+    }
+
+    .buy-box-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .qty-select {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 8px 12px;
+        width: 100%;
+    }
+
+    .btn-add-cart {
+        background: var(--secondary-color);
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+    }
+
+    .btn-back {
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px;
+        width: 100%;
+        background: transparent;
     }
 </style>
 
-<div class="container mt-5">
-    <div class="product-details-card">
+<div class="container mt-4 mb-5">
 
-        <div class="row g-0">
+    <div class="row product-wrapper g-4">
 
-            <!-- 🖼 PRODUCT IMAGE -->
-            <img src="@($"/images/products/{Model.Image}")"
-                 class="product-img"
-                 alt="@Model.Name" />
+        <!-- LEFT IMAGE -->
+        <div class="col-lg-5 col-md-6">
+            <div class="image-container">
+                <img src="@Url.Content("~/images/products/" + Model.Image)"
+                     class="product-image"
+                     alt="@Model.Name" />
+            </div>
+        </div>
 
+        <!-- CENTER DETAILS -->
+        <div class="col-lg-4 col-md-6">
 
-            
+            <h1 class="product-title">@Model.Name</h1>
 
-            <!-- 📄 PRODUCT INFO -->
-            <div class="col-md-7 p-4">
-
-                <h2 class="mb-2">@Model.Name</h2>
-
-                <span class="category-badge mb-3">
-                    @Model.CategoryName
+            <div class="price-box">
+                <span class="discount-text">-@discount%</span>
+                <span class="price-current">
+                    <span class="price-symbol">₹</span>@Model.Price
                 </span>
+            </div>
 
-                <div class="my-3">
-                    @{
-                        var discount = 15;
-                        var oldPrice = Model.Price + (Model.Price * discount / 100);
-                    }
+            <span class="price-old">M.R.P.: ₹@oldPrice</span>
 
-                    <span class="price-box">₹@Model.Price</span>
-                    <span class="old-price">₹@oldPrice</span>
+            @if (Model.Quantity > 0)
+            {
+                <div class="stock-status stock-in">
+                    In Stock
+                </div>
+                <div class="text-muted small mb-3">
+                    Quantity left: @Model.Quantity
+                </div>
+            }
+            else
+            {
+                <div class="stock-status stock-out">
+                    Currently Unavailable
+                </div>
+                <div class="text-muted small mb-3">
+                    We don't know when or if this item will be back in stock.
+                </div>
+            }
+
+        </div>
+
+        <!-- RIGHT BUY BOX -->
+        <div class="col-lg-3">
+
+            <div class="buy-box">
+
+                <div class="buy-box-price">
+                    <span class="price-symbol">₹</span>@Model.Price
                 </div>
 
-                <p class="text-muted">
-                    High quality product with best price.
-                    7-day replacement • Secure payment • Fast delivery
-                </p>
+                @if (Model.Quantity > 0)
+                {
+                    <div class="mb-4">
+                        <label class="fw-bold mb-2 small">Quantity:</label>
+                        <input type="number"
+                               value="1"
+                               min="1"
+                               max="@Model.Quantity"
+                               class="form-control qty-select" />
+                    </div>
 
-                <div class="mt-4 d-flex gap-3">
                     <a asp-controller="Cart"
                        asp-action="AddToCart"
                        asp-route-id="@Model.Id"
-                       class="btn btn-success buy-btn">
-                        🛒 Add to Cart
+                       class="btn-add-cart mb-3">
+                        Add to Cart
                     </a>
+                }
+                else
+                {
+                    <button class="btn-add-cart mb-3"
+                            style="background:#ccc; cursor:not-allowed;"
+                            disabled>
+                        Out of Stock
+                    </button>
+                }
 
-                    <a asp-controller="Home"
-                       asp-action="Index"
-                       class="btn btn-outline-secondary buy-btn">
-                        Continue Shopping
-                    </a>
-                </div>
+                <button type="button"
+                        class="btn-back"
+                        onclick="history.back();">
+                    Back to Products
+                </button>
 
             </div>
 
         </div>
+
     </div>
+
 </div>

@@ -1,0 +1,140 @@
+﻿@model EC.Models.SellerDashboardViewModel
+
+@{
+    ViewData["Title"] = "Seller Dashboard";
+    Layout = "_Layout";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+
+    <!-- Header with buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-chart-line text-primary"></i>
+            Seller Dashboard
+        </h2>
+
+        <div>
+            <a asp-controller="Seller" asp-action="Orders" class="btn btn-outline-dark me-2">
+                <i class="fas fa-receipt"></i> Orders
+            </a>
+
+            <a asp-controller="Seller" asp-action="Products" class="btn btn-warning">
+                <i class="fas fa-box"></i> Manage Products
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6>Total Products</h6>
+                <h3>@Model.ProductCount</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6>Total Orders</h6>
+                <h3>@Model.Orders.Count</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6>Revenue</h6>
+                <h3>₹@Model.Revenue.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h6>Profit</h6>
+                <h3>₹@Model.Profit.ToString("N0")</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Top Products and Recent Orders -->
+    <div class="row g-4">
+
+        <!-- Top Selling Products -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <strong>Top Selling Products</strong>
+                </div>
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-end">Sold</th>
+                        </tr>
+                    </thead>
+                   <tbody>
+                        @if (Model.TopProducts != null && Model.TopProducts.Any())
+                        {
+                            foreach (var p in Model.TopProducts.Take(5))
+                            {
+                                @* <tr>
+                                    <td>@p.ProductId</td>
+                                    <td class="text-end">@p.Total</td>
+                                </tr> *@
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center">No Data</td>
+                            </tr>
+                        }
+                    </tbody> 
+                </table>
+            </div>
+        </div >
+
+        <!-- Recent Orders -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <strong>Recent Orders</strong>
+                </div>
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Date</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                        {
+                            foreach (var o in Model.RecentOrders.Take(5))
+                            {
+                                <tr>
+                                    <td>@o.ProductName</td>
+                                    <td>@o.OrderDate.ToString("dd MMM yyyy")</td>
+                                    <td class="text-end">₹@o.Total.ToString("N0")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">No Orders</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div> 
+
+    </div>
+
+</div>
