@@ -221,7 +221,7 @@
                         {
                             <tr>
                                 <td class="order-id">#@order.Id</td>
-                                <td class="fw-semibold">@order.UserName</td>
+                                <td class="fw-semibold">@order.Name</td>
                                 <td class="fw-bold" style="color: #B12704;">₹@order.TotalAmount</td>
                                 <td>
                                     @if (order.PaymentMethod == "COD")
@@ -271,100 +271,3 @@
     </div>
 </div>
 
-<script>
-    function showOrderDetails(orderId) {
-
-        // Show loading state
-        document.getElementById("orderDetailsContent").innerHTML = `
-            <div class="text-center py-5 text-muted">
-                <i class="fas fa-circle-notch fa-spin fa-2x mb-3" style="color: var(--primary-color);"></i>
-                <p>Generating Invoice...</p>
-            </div>`;
-
-        var myModal = new bootstrap.Modal(document.getElementById('orderModal'));
-        myModal.show();
-
-        fetch('/Admin/GetOrderDetails?orderId=' + orderId)
-            .then(response => response.json())
-            .then(order => {
-
-                let paymentBadge = "";
-
-                if (order.paymentMethod === "COD") {
-                    paymentBadge = `<span class="status-badge badge-cod"><i class="fas fa-hand-holding-usd"></i> Cash On Delivery</span>`;
-                } else if (order.paymentMethod === "Online") {
-                    paymentBadge = `
-                        <div>
-                            <span class="status-badge badge-online mb-1"><i class="fas fa-check-circle"></i> Paid Online</span>
-                            <div class="small text-muted mt-1">Txn ID: ${order.paymentId ?? 'N/A'}</div>
-                        </div>`;
-                }
-
-                let itemsHtml = "";
-                let count = 1;
-
-              order.items.forEach(item => {
-                    itemsHtml += `
-                        <tr>
-                            <td class="text-muted">${count}</td>
-                            <td class="text-start fw-semibold text-dark">${item.productName}</td>
-                            <td class="text-muted">₹${item.price}</td>
-                            <td class="text-muted">${item.quantity}</td>
-                            <td class="text-dark fw-bold">₹${item.price * item.quantity}</td>
-                        </tr>
-                    `;
-                    count++;
-                });
-
-                let fullHtml = `
-                    <div class="invoice-card">
-                        <div class="invoice-header">
-                            <div class="invoice-user-details">
-                                <div class="invoice-title"><i class="fas fa-receipt text-primary me-2"></i> Invoice #${order.id}</div>
-                                <p><strong class="text-dark">Customer:</strong> ${order.userName}</p>
-                                <p><strong class="text-dark">Email:</strong> ${order.email}</p>
-                            </div>
-                            <div class="text-end">
-                                <div class="mb-3">
-                                    <span class="status-badge badge-status mb-1">Status: ${order.status}</span>
-                                </div>
-                                ${paymentBadge}
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table invoice-table text-center align-middle">
-                                <thead>
-                                    <tr>
-                                        <th style="width:50px;">#</th>
-                                        <th class="text-start">Product Description</th>
-                                        <th style="width:120px;">Unit Price</th>
-                                        <th style="width:80px;">Qty</th>
-                                        <th style="width:120px;" class="text-end">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${itemsHtml}
-                                </tbody>
-                                <tfoot>
-                                    <tr class="invoice-summary-row">
-                                        <td colspan="4" class="text-end border-0 pt-4">Grand Total:</td>
-                                        <td class="text-end border-0 pt-4 text-danger">₹${order.totalAmount}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById("orderDetailsContent").innerHTML = fullHtml;
-            })
-            .catch(error => {
-                document.getElementById("orderDetailsContent").innerHTML = `
-                    <div class="text-center py-5 text-danger">
-                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                        <p>Error loading order details. Please try again.</p>
-                    </div>`;
-            });
-    }
-</script>

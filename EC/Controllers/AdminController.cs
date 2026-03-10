@@ -9,7 +9,7 @@ namespace EC.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
-    {   
+    {
         private readonly DbHelper _db;
         private readonly EmailHelper _email;
 
@@ -125,7 +125,7 @@ namespace EC.Controllers
 
         // ================= USERS LIST =================
         [HttpGet]
-       
+
         public IActionResult UserList()
         {
             List<User> users = new List<User>();

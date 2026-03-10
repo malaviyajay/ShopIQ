@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EC.Controllers
 {
-    //[Authorize]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly DbHelper _db;

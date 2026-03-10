@@ -5,9 +5,10 @@ namespace EC.Models
 {
     public class Seller
     {
-        public int Id { get; set; } // Seller ID, maps to Users.Id
+        public int Id { get; set; } // Seller ID, Maps To Users.Id
         [Required]
-        public string Name { get; set; } // Seller name
+        public string Name { get; set; } // Seller Name
+
         [Required, EmailAddress]
         public string Email { get; set; }
         public string Phone { get; set; }

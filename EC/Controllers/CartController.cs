@@ -3,7 +3,7 @@ using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-
+using System.Security.Claims;
 namespace EC.Controllers;
 
 [Authorize(Roles = "Customer")]

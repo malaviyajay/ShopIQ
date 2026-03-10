@@ -59,15 +59,15 @@ namespace EC.Controllers
                 order.Status = "Paid";
                 order.PaymentMethod = "Online";
 
-                // Get Stripe session details
+                
                 var service = new SessionService();
                 var session = service.Get(sessionId);
-                order.PaymentId = session.PaymentIntentId; // Save the Payment ID
+                order.PaymentId = session.PaymentIntentId; 
 
                 _db.PlaceOrder(new CheckoutViewModel
                 {
                     UserId = order.UserId,
-                    UserName = order.UserName,
+                    UserName = order.Name,
                     TotalAmount = order.TotalAmount,
                     PaymentMethod = order.PaymentMethod,
                     Items = order.Items

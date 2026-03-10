@@ -1,32 +1,249 @@
 ﻿@model List<EC.Models.Order>
 
-<h2>My Orders</h2>
+@{
+    ViewData["Title"] = "Seller Orders";
+    Layout = "_Layout";
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Date</th>
-            <th class="text-end">Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var o in Model)
-            {
-                <tr>
-                    <td>@o.UserName</td>
-                    <td>@o.OrderDate.ToString("dd MMM yyyy")</td>
-                    <td class="text-end">₹@o.TotalAmount.ToString("N0")</td>
-                </tr>
-            }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #007185;
+        --secondary-color: #f7ca00;
+        --secondary-hover: #e0b700;
+        --text-main: #0F1111;
+        --text-muted: #565959;
+        --bg-light: #f3f3f3;
+        --white: #ffffff;
+        --border-color: #e7e7e7;
+        --success-bg: #d1e7dd;
+        --success-text: #0f5132;
+        --warning-bg: #fff3cd;
+        --warning-text: #856404;
+        --info-bg: #cff4fc;
+        --info-text: #055160;
+    }
+
+    body {
+        background: var(--bg-light);
+        font-family: "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+        color: var(--text-main);
+    }
+
+    .orders-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 40px 15px;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .dash-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dashboard-card {
+        background: var(--white);
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        overflow: hidden;
+    }
+
+    .table-wrapper {
+        padding: 20px 25px;
+    }
+
+    .admin-table th {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border-bottom: 2px solid var(--border-color);
+        padding: 15px 10px;
+    }
+
+    .admin-table td {
+        padding: 15px 10px;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 0.95rem;
+    }
+
+    .admin-table tr:hover td {
+        background-color: var(--bg-light);
+    }
+
+    .order-id {
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .badge-cod {
+        background: var(--warning-bg);
+        color: var(--warning-text);
+    }
+
+    .badge-online {
+        background: var(--success-bg);
+        color: var(--success-text);
+    }
+
+    .badge-status {
+        background: var(--info-bg);
+        color: var(--info-text);
+    }
+
+    .btn-view {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all .2s;
+    }
+
+        .btn-view:hover {
+            background: var(--primary-color);
+            color: var(--white);
         }
-        else
-        {
-            <tr>
-                <td colspan="3" class="text-center">No Orders Found</td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+    .btn-back {
+        margin-top: 20px;
+        display: inline-block;
+        background: #eee;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+    }
+</style>
+
+<div class="orders-container">
+
+    <div class="dashboard-header">
+        <h1 class="dash-title">
+            <i class="fas fa-shopping-bag text-primary"></i>
+            Seller Orders
+        </h1>
+    </div>
+
+    <div class="dashboard-card">
+        <div class="table-wrapper table-responsive">
+
+            <table class="table admin-table">
+
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>C.Name</th>
+                        <th>Date</th>
+                        <th>Total Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var order in Model)
+                        {
+                            <tr>
+
+                                <td class="order-id">#@order.Id</td>
+
+                                <td class="fw-semibold">
+                                    @order.Name
+                                </td>
+
+                                <td>
+                                    @order.OrderDate.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td class="fw-bold text-danger">
+                                    ₹@order.TotalAmount
+                                </td>
+
+                                <td>
+
+                                    @if (order.PaymentMethod == "COD")
+                                    {
+                                        <span class="status-badge badge-cod">
+                                            <i class="fas fa-hand-holding-usd"></i> COD
+                                        </span>
+                                    }
+
+                                    else if (order.PaymentMethod == "Online")
+                                    {
+                                        <span class="status-badge badge-online">
+                                            <i class="fas fa-credit-card"></i> Online
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    <span class="status-badge badge-status">
+                                        @order.Status
+                                    </span>
+                                </td>
+
+                                <td class="text-end">
+
+                                    <a asp-controller="Seller"asp-action="OrderDetails"asp-route-id="@order.Id"
+                                       class="btn-view text-decoration-none">
+                                        View
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No Orders Found
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <a asp-controller="Seller" asp-action="Dashboard" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+</div>
