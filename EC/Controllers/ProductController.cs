@@ -97,7 +97,7 @@ namespace EC.Controllers
                 return View(model);
             }
 
-            _db.UpdateProduct(model);
+            _db.UpdateProduct(model); 
             return RedirectToAction("Index");
         }
 

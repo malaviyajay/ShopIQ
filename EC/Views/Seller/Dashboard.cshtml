@@ -1,12 +1,13 @@
 ﻿@model EC.Models.SellerDashboardViewModel
 
-
 @{
     ViewData["Title"] = "Seller Dashboard";
     Layout = "_Layout";
 }
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+
 
 <style>
     :root {
@@ -206,7 +207,7 @@
         <div class="stat-card">
             <div class="stat-info">
                 <h3>Products</h3>
-                <p>@Model.ProductCount</p>
+                <p>@Model.Product.Count</p>
             </div>
             <div class="stat-icon bg-blue-soft"><i class="fas fa-boxes"></i></div>
         </div>
@@ -251,12 +252,11 @@
                         <tbody>
                             @if (Model.TopProducts != null && Model.TopProducts.Any())
                             {
-                                foreach (var o in Model.RecentOrders.Take(5))
+                                foreach (var p in Model.TopProducts.Take(5))
                                 {
                                     <tr>
-                                        <td>@o.ProductName</td>
-                                        <td>@o.OrderDate.ToString("dd MMM yyyy")</td>
-                                        <td class="text-end">₹@o.Total.ToString("N0")</td>
+                                        <td>@p.TopProductName</td>
+                                        <td class="text-end">@p.TotalSold</td>
                                     </tr>
                                 }
                             }
@@ -285,14 +285,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                            @if (Model.Recentorders != null && Model.Recentorders.Any())
                             {
-                                foreach (var o in Model.RecentOrders.Take(5))
+                                foreach (var o in Model.Recentorders.Take(5))
                                 {
                                     <tr>
                                         <td class="fw-bold">@o.ProductName</td>
                                         <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> @o.OrderDate.ToString("dd MMM yyyy")</td>
-                                        <td class="text-end fw-bold" style="color: var(--danger);">₹@o.Total.ToString("N0")</td>
+                                        <td class="text-end fw-bold" style="color: var(--danger);">₹@o.Amount.ToString("N0")</td>
                                     </tr>
                                 }
                             }

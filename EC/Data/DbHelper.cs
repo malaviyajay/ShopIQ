@@ -37,7 +37,7 @@ namespace EC.Data
             cmd.Parameters.AddWithValue("@p", user.Password);
             cmd.Parameters.AddWithValue("@d", user.Address);
             cmd.Parameters.AddWithValue("@m", user.Phone);
-            
+
 
 
             int userId = Convert.ToInt32(cmd.ExecuteScalar());
@@ -256,25 +256,50 @@ namespace EC.Data
 
         // ================= PRODUCTS =================
 
+        //    public void AddProduct(Product p)
+        //    {
+        //        using var con = GetConnection();
+        //        con.Open();
+
+
+        //        var cmd = new SqlCommand(@"
+        //INSERT INTO Products
+        //(Name, Price, Image, CategoryId, Quantity, SellerId)
+        //VALUES
+        //(@name, @price, @image, @categoryId, @quantity, @sellerId)
+        //", con);
+
+        //        cmd.Parameters.AddWithValue("@name", p.Name);
+        //        cmd.Parameters.AddWithValue("@price", p.Price);
+        //        cmd.Parameters.AddWithValue("@image", p.Image);
+        //        cmd.Parameters.AddWithValue("@categoryId", p.CategoryId);
+        //        cmd.Parameters.AddWithValue("@quantity", p.Quantity);
+        //        cmd.Parameters.AddWithValue("@sellerId", p.SellerId);
+
+        //        cmd.ExecuteNonQuery();
+        //    }
+
         public void AddProduct(Product p)
         {
             using var con = GetConnection();
             con.Open();
 
             var cmd = new SqlCommand(@"
-        INSERT INTO Products (Name, Price,Image, CategoryId, Quantity,SellerId)
-        VALUES (@n,@p,@i,@c,@q,@s)", con);
+INSERT INTO Products
+(Name, Price, Image, CategoryId, Quantity, SellerId)
+VALUES
+(@name, @price, @image, @categoryId, @quantity, @sellerId)
+", con);
 
-            cmd.Parameters.AddWithValue("@n", p.Name);
-            cmd.Parameters.AddWithValue("@p", p.Price);
-            cmd.Parameters.AddWithValue("@i", p.Image ?? "");
-            cmd.Parameters.AddWithValue("@c", p.CategoryId);
-            cmd.Parameters.AddWithValue("@q", p.Quantity);
-            cmd.Parameters.AddWithValue("@s", p.SellerId);
+            cmd.Parameters.AddWithValue("@name", p.Name);
+            cmd.Parameters.AddWithValue("@price", p.Price);
+            cmd.Parameters.AddWithValue("@image", p.Image); // must be set here
+            cmd.Parameters.AddWithValue("@categoryId", p.CategoryId);
+            cmd.Parameters.AddWithValue("@quantity", p.Quantity);
+            cmd.Parameters.AddWithValue("@sellerId", p.SellerId);
 
             cmd.ExecuteNonQuery();
         }
-
         public Product? GetProduct(int id)
         {
             using var con = GetConnection();
@@ -296,7 +321,7 @@ namespace EC.Data
                     Price = Convert.ToDecimal(rd["Price"]),
                     Image = Convert.ToString(rd["Image"]) ?? "",
                     CategoryId = Convert.ToInt32(rd["CategoryId"]),
-                    Quantity = Convert.ToInt32(rd["Quantity"]) // ✅ IMPORTANT FIX
+                    Quantity = Convert.ToInt32(rd["Quantity"])
                 };
             }
 
@@ -370,7 +395,7 @@ namespace EC.Data
                 con.Open();
 
                 using (SqlCommand cmd = new SqlCommand(
-                    "SELECT Id, Name, Price, Image, CategoryId, Quantity FROM Products WHERE Id=@Id", con))
+                    "SELECT Id, Name, Price, Image, CategoryId, Quantity,SellerId FROM Products WHERE Id=@Id", con))
                 {
                     cmd.Parameters.AddWithValue("@Id", id);
 
@@ -385,7 +410,9 @@ namespace EC.Data
                                 Price = rd["Price"] != DBNull.Value ? Convert.ToDecimal(rd["Price"]) : 0,
                                 Image = rd["Image"] != DBNull.Value ? rd["Image"].ToString() ?? "" : "",
                                 CategoryId = rd["CategoryId"] != DBNull.Value ? Convert.ToInt32(rd["CategoryId"]) : 0,
-                                Quantity = rd["Quantity"] != DBNull.Value ? Convert.ToInt32(rd["Quantity"]) : 0
+                                Quantity = rd["Quantity"] != DBNull.Value ? Convert.ToInt32(rd["Quantity"]) : 0,
+                                //===================================================================
+                                SellerId = rd["SellerId"] != DBNull.Value ? Convert.ToInt32(rd["SellerId"]) : 0,
                             });
                         }
                     }
@@ -453,7 +480,7 @@ namespace EC.Data
             orderCmd.Parameters.AddWithValue("@pay", model.PaymentMethod);
             orderCmd.Parameters.AddWithValue("@status", model.Status);
 
-            // ✅ Fix for NULL values (important)
+            // ================Fix for NULL values (important)===============
             orderCmd.Parameters.AddWithValue("@StripeCheckoutSessionId",
                 (object?)model.StripeCheckoutSessionId ?? DBNull.Value);
 
@@ -461,25 +488,35 @@ namespace EC.Data
                 (object?)model.StripePaymentId ?? DBNull.Value);
 
             int orderId = Convert.ToInt32(orderCmd.ExecuteScalar());
-
             foreach (var item in model.Items)
             {
+                // get seller id from product table
+                var sellerCmd = new SqlCommand(
+                    "SELECT SellerId FROM Products WHERE Id=@pid", con);
+
+                sellerCmd.Parameters.AddWithValue("@pid", item.ProductId);
+
+                int sellerId = Convert.ToInt32(sellerCmd.ExecuteScalar());
+
                 var itemCmd = new SqlCommand(@"
-            INSERT INTO OrderItems 
-            (OrderId, ProductId, ProductName, Price, Quantity)
-            VALUES (@oid,@pid,@name,@price,@qty)", con);
+    INSERT INTO OrderItems 
+    (OrderId, ProductId, ProductName, Price, Quantity, SellerId)
+    VALUES (@oid,@pid,@name,@price,@qty,@sid)", con);
 
                 itemCmd.Parameters.AddWithValue("@oid", orderId);
                 itemCmd.Parameters.AddWithValue("@pid", item.ProductId);
                 itemCmd.Parameters.AddWithValue("@name", item.ProductName ?? "");
                 itemCmd.Parameters.AddWithValue("@price", item.Price);
                 itemCmd.Parameters.AddWithValue("@qty", item.Quantity);
+                itemCmd.Parameters.AddWithValue("@sid", sellerId);
 
-          //================== Decrease Product Stock=======================
-              var stockCmd = new SqlCommand(@"
-                    UPDATE Products
-                    SET Quantity = Quantity - @qty
-                    WHERE Id = @pid", con);
+                itemCmd.ExecuteNonQuery();
+
+                // decrease stock
+                var stockCmd = new SqlCommand(@"
+                        UPDATE Products
+                        SET Quantity = Quantity - @qty
+                        WHERE Id = @pid", con);
 
                 stockCmd.Parameters.AddWithValue("@pid", item.ProductId);
                 stockCmd.Parameters.AddWithValue("@qty", item.Quantity);
@@ -568,6 +605,7 @@ namespace EC.Data
                 {
                     Id = Convert.ToInt32(rd["Id"]),
                     UserId = Convert.ToInt32(rd["UserId"]),
+
                     Name = Convert.ToString(rd["UserName"]),
                     TotalAmount = Convert.ToDecimal(rd["TotalAmount"]),
                     PaymentMethod = Convert.ToString(rd["PaymentMethod"]),
@@ -577,27 +615,67 @@ namespace EC.Data
             }
             return list;
         }
+
         //================= update product =======================
+        //public void UpdateProduct(Product product)
+        //{
+        //    using var con = GetConnection();
+        //    con.Open();
+
+        //    var cmd = new SqlCommand(
+        //        @"UPDATE Products
+        //          SET Name = @name,
+        //              Price = @price,
+        //              Image = @image,
+        //              CategoryId = @category,
+        //              Quantity = @qty
+        //          WHERE Id = @id", con);
+
+        //    cmd.Parameters.AddWithValue("@name", product.Name);
+        //    cmd.Parameters.AddWithValue("@price", product.Price);
+        //    cmd.Parameters.AddWithValue("@image", product.Image);
+        //    cmd.Parameters.AddWithValue("@category", product.CategoryId);
+        //    cmd.Parameters.AddWithValue("@qty", product.Quantity);
+        //    cmd.Parameters.AddWithValue("@id", product.Id);
+
+        //    cmd.ExecuteNonQuery();
+        //}
+
         public void UpdateProduct(Product product)
         {
             using var con = GetConnection();
             con.Open();
 
-            var cmd = new SqlCommand(
-                @"UPDATE Products
+            string query;
+            if (!string.IsNullOrEmpty(product.Image)) // new image uploaded
+            {
+                query = @"UPDATE Products
                   SET Name = @name,
                       Price = @price,
                       Image = @image,
                       CategoryId = @category,
                       Quantity = @qty
-                  WHERE Id = @id", con);
+                  WHERE Id = @id";
+            }
+            else // keep existing image
+            {
+                query = @"UPDATE Products
+                  SET Name = @name,
+                      Price = @price,
+                      CategoryId = @category,
+                      Quantity = @qty
+                  WHERE Id = @id";
+            }
 
+            var cmd = new SqlCommand(query, con);
             cmd.Parameters.AddWithValue("@name", product.Name);
             cmd.Parameters.AddWithValue("@price", product.Price);
-            cmd.Parameters.AddWithValue("@image", product.Image);
             cmd.Parameters.AddWithValue("@category", product.CategoryId);
             cmd.Parameters.AddWithValue("@qty", product.Quantity);
             cmd.Parameters.AddWithValue("@id", product.Id);
+
+            if (!string.IsNullOrEmpty(product.Image))
+                cmd.Parameters.AddWithValue("@image", product.Image); // only if new image
 
             cmd.ExecuteNonQuery();
         }
@@ -636,7 +714,7 @@ namespace EC.Data
                     Price = Convert.ToDecimal(rd["Price"]),
                     Image = Convert.ToString(rd["Image"]) ?? "",
                     CategoryId = Convert.ToInt32(rd["CategoryId"]),
-                    Category = Convert.ToString(rd["CategoryName"]) ?? ""
+                    //Category = Convert.ToString(rd["CategoryName"]) ?? ""
                 });
             }
 
@@ -980,7 +1058,7 @@ namespace EC.Data
             }
             pr.Close();
 
-            //====================== RECENT ORDERS========================
+            //====================== RECENT ORDERS ========================
             var recentCmd = new SqlCommand(@"
         SELECT TOP 5 UserName, OrderDate, TotalAmount
         FROM Orders
@@ -999,7 +1077,6 @@ namespace EC.Data
 
             return model;
         }
-
         //================UpdateStripeSession=====================
         public void UpdateStripeSession(int orderId, string sessionId)
         {
@@ -1095,14 +1172,15 @@ namespace EC.Data
         //================ seller dashbord ===================
         public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
         {
-            // Example: fetch dashboard data for seller
+            // Fetch products and orders
             var products = GetProductsBySeller(sellerId);
             var orders = GetOrdersBySeller(sellerId);
 
-            return new SellerDashboardViewModel
+            // Initialize dashboard model
+            var model = new SellerDashboardViewModel
             {
-                SellerName = $"Seller {sellerId}",
                 SellerId = sellerId,
+                SellerName = $"Seller {sellerId}",
                 ProductCount = products.Count,
                 Order = orders.Count,
                 Revenue = orders.Sum(o => o.TotalAmount),
@@ -1110,7 +1188,36 @@ namespace EC.Data
                 Product = products,
                 Orders = orders
             };
+
+            // Populate Top Selling Products (count orders per product)
+            model.TopProducts = orders
+                .Where(o => products.Any(p => p.Name == o.ProductName)) // Only seller's products
+                .GroupBy(o => o.ProductName)
+                .Select(g => new TopProduct
+                {
+                    TopProductName = g.Key,
+                    TotalSold = g.Count() // Count of orders containing this product
+                })
+                .OrderByDescending(tp => tp.TotalSold)
+                .Take(5)
+                .ToList();
+
+            // Populate Recent Orders
+            model.Recentorders = orders
+                .OrderByDescending(o => o.OrderDate)
+                .Take(5)
+                .Select(o => new RecentOrder
+                {
+                    ProductName = o.ProductName,
+                    OrderDate = o.OrderDate,
+                    Amount = o.TotalAmount,
+                 
+                })
+                .ToList();
+
+            return model;
         }
+
         public List<Product> GetProductsBySeller(int sellerId)
         {
             var list = new List<Product>();
@@ -1150,6 +1257,46 @@ namespace EC.Data
 
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
+        //public List<Order> GetOrdersBySeller(int sellerId)
+        //{
+        //    var orders = new List<Order>();
+
+        //    using (var con = new SqlConnection(_con))
+        //    {
+        //        var cmd = new SqlCommand(@"
+        //            SELECT 
+        //                o.Id,
+        //                o.OrderDate,
+        //                o.TotalAmount,
+        //                u.Name AS CustomerName,
+        //                p.Name AS ProductName
+        //            FROM Orders o
+        //            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
+        //            INNER JOIN Products p ON oi.ProductId = p.Id
+        //            INNER JOIN Users u ON o.UserId = u.Id
+        //            WHERE p.SellerId = @SellerId
+        //            ORDER BY o.OrderDate DESC", con);
+
+        //        cmd.Parameters.AddWithValue("@SellerId", sellerId);
+
+        //        con.Open();
+        //        var reader = cmd.ExecuteReader();
+
+        //        while (reader.Read())
+        //        {
+        //            orders.Add(new Order
+        //            {
+        //                Id = Convert.ToInt32(reader["Id"]),
+        //                OrderDate = Convert.ToDateTime(reader["OrderDate"]),
+        //                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
+        //                ProductName = Convert.ToString(reader["ProductName"]),
+        //            });
+        //        }
+        //    }
+
+
+        //    return orders;
+        //}
         public List<Order> GetOrdersBySeller(int sellerId)
         {
             var orders = new List<Order>();
@@ -1157,18 +1304,20 @@ namespace EC.Data
             using (var con = new SqlConnection(_con))
             {
                 var cmd = new SqlCommand(@"
-                    SELECT 
-                        o.Id,
-                        o.OrderDate,
-                        o.TotalAmount,
-                        u.Name AS CustomerName,
-                        p.Name AS ProductName
-                    FROM Orders o
-                    INNER JOIN OrderItems oi ON o.Id = oi.OrderId
-                    INNER JOIN Products p ON oi.ProductId = p.Id
-                    INNER JOIN Users u ON o.UserId = u.Id
-                    WHERE p.SellerId = @SellerId
-                    ORDER BY o.OrderDate DESC", con);
+        SELECT 
+            o.Id,
+            o.OrderDate,
+            o.TotalAmount,
+            o.Status,
+            o.PaymentMethod,
+            u.Name AS CustomerName,
+            p.Name AS ProductName
+        FROM Orders o
+        INNER JOIN OrderItems oi ON o.Id = oi.OrderId
+        INNER JOIN Products p ON oi.ProductId = p.Id
+        INNER JOIN Users u ON o.UserId = u.Id
+        WHERE p.SellerId = @SellerId
+        ORDER BY o.OrderDate DESC", con);
 
                 cmd.Parameters.AddWithValue("@SellerId", sellerId);
 
@@ -1182,14 +1331,16 @@ namespace EC.Data
                         Id = Convert.ToInt32(reader["Id"]),
                         OrderDate = Convert.ToDateTime(reader["OrderDate"]),
                         TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
+                        Status = Convert.ToString(reader["Status"]),
+                        PaymentMethod = Convert.ToString(reader["PaymentMethod"]),
                         ProductName = Convert.ToString(reader["ProductName"]),
+                        Name = Convert.ToString(reader["CustomerName"])
                     });
                 }
             }
 
-
             return orders;
         }
-      
+
     }
 }

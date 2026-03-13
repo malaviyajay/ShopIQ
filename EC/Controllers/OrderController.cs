@@ -56,5 +56,7 @@ namespace EC.Controllers
 
             return Content(html, "text/html");
         }
+
     }
 }
+

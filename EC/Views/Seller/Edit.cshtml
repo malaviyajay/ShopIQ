@@ -1,13 +1,13 @@
 ﻿@model EC.Models.Product
 @{
     ViewData["Title"] = "Edit Product";
-    Layout = "_Layout"; // Keep your main layout
+    Layout = "_Layout"; 
 }
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* ===== Use your existing CSS ===== */
+
     :root {
         --primary-color: #007185;
         --secondary-color: #f7ca00;
@@ -213,7 +213,7 @@
         </div>
 
         <div class="form-body">
-            <form asp-action="EditProduct" method="post">
+            <form asp-controller="Seller" asp-action="Edit" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
 
@@ -233,8 +233,11 @@
                     </div>
                 </div>
 
-                <label class="form-label"><i class="fas fa-image"></i> Image File Name</label>
-                <input asp-for="Image" class="custom-input" required />
+                <label class="form-label">
+                    <i class="fas fa-image"></i> Product Image
+                </label>
+
+                <input type="file" name="imageFile" class="custom-input" />
 
                 <label class="form-label"><i class="fas fa-cubes"></i> Available Quantity</label>
                 <div class="quantity-container">
@@ -254,8 +257,8 @@
                         <i class="fas fa-save"></i> Update Product
                     </button>
 
-                    <a asp-controller="Seller" asp-action="Dashboard" class="btn-back">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    <a asp-controller="Seller" asp-action="Products" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Inventory Management
                     </a>
                 </div>
 

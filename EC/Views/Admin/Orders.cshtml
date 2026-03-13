@@ -184,6 +184,34 @@
         font-weight: 700;
         font-size: 1.1rem;
     }
+    .btn-update {
+        background: #ffd814;
+        border: 1px solid #fcd200;
+        color: #111;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+        .btn-update:hover {
+            background: #f7ca00;
+        }
+
+    .btn-back {
+        background: #ffd814;
+        border: 1px solid #fcd200;
+        color: #111;
+        border-radius: 6px;
+        padding: 8px 18px;
+        font-weight: 600;
+        margin-top: 18px;
+    }
+
+        .btn-back:hover {
+            background: #f7ca00;
+        }
+
 </style>
 
 <div class="orders-container">
@@ -271,3 +299,76 @@
     </div>
 </div>
 
+
+    <button type="button" class="btn-back" onclick="history.back();">
+        ← Go Back
+    </button>
+    <script>
+function showOrderDetails(orderId) {
+
+    var modal = new bootstrap.Modal(document.getElementById('orderModal'));
+    modal.show();
+
+    document.getElementById("orderDetailsContent").innerHTML =
+        `<div class="text-center py-5 text-muted">
+            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+            <p>Loading invoice details...</p>
+        </div>`;
+
+    fetch('/Admin/GetOrderDetails?orderId=' + orderId)
+        .then(response => response.json())
+        .then(data => {
+
+            let html = `
+            <div class="invoice-card">
+                <div class="invoice-header">
+                    <div>
+                        <div class="invoice-title">Order #${orderId}</div>
+                    </div>
+                </div>
+
+                <table class="table invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            let total = 0;
+
+            data.forEach(item => {
+                let rowTotal = item.price * item.quantity;
+                total += rowTotal;
+
+                html += `
+                <tr>
+                    <td>${item.productName}</td>
+                    <td>₹${item.price}</td>
+                    <td>${item.quantity}</td>
+                    <td>₹${rowTotal}</td>
+                </tr>`;
+            });
+
+            html += `
+                    <tr class="invoice-summary-row">
+                        <td colspan="3">Total</td>
+                        <td>₹${total}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>`;
+
+            document.getElementById("orderDetailsContent").innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById("orderDetailsContent").innerHTML =
+                `<div class="text-danger text-center p-4">
+                    Failed to load order details.
+                </div>`;
+        });
+}
+</script>

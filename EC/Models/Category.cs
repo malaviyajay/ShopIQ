@@ -1,4 +1,4 @@
-﻿namespace EC.Models
+﻿    namespace EC.Models
 {
     public class Category
     {

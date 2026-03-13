@@ -192,13 +192,14 @@
             padding: 4rem 0 2rem 0;
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .social-btn {
             width: 45px;
             height: 45px;
             border-radius: 12px;
-            background: rgba(255,255,255,.05);
+            background: rgba(255, 255, 255, 0.05);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -206,19 +207,20 @@
             color: #fff;
             text-decoration: none;
             font-size: 1.2rem;
-            border: 1px solid rgba(255,255,255,.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
         }
 
             .social-btn:hover {
                 background: var(--primary);
-                transform: translateY(-5px);
                 color: #fff;
+                transform: translateY(-5px);
                 border-color: var(--primary);
             }
 
         .footer-divider {
             height: 1px;
-            background: rgba(255,255,255,.1);
+            background: rgba(255, 255, 255, 0.1);
             margin: 2rem 0;
         }
 
@@ -377,47 +379,31 @@
     <main class="container mt-4 pt-2">
         @RenderBody()
     </main>
+    <footer class="footer bg-dark text-light pt-5">
+        <div class="container">
+            <div class="row">
 
-    <footer class="social-footer">
+                <!-- Social & Newsletter -->
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-semibold mb-3">Connect with Us</h5>
 
-        <div class="container text-center">
-
-            <div class="mb-4">
-                <h4 class="fw-bold mb-1">ShopIQ</h4>
-                <p class="text-secondary small">
-                    Your intelligent shopping companion.
-                </p>
-            </div>
-
-            <div class="d-flex justify-content-center">
-
-                <a href="https://www.facebook.com" class="social-btn">
-                    <i class="bi bi-facebook"></i>
-                </a>
-
-                <a href="https://www.instagram.com" class="social-btn">
-                    <i class="bi bi-instagram"></i>
-                </a>
-
-                <a href="https://www.youtube.com" class="social-btn">
-                    <i class="bi bi-youtube"></i>
-                </a>
-
-                <a href="#" class="social-btn">
-                    <i class="bi bi-twitter-x"></i>
-                </a>
+                    <!-- Social icons -->
+                    <div class="d-flex gap-2 mb-3">
+                        <a href="https://www.facebook.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
+                        <a href="https://www.instagram.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
+                        <a href="https://www.youtube.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-youtube"></i></a>
+                        <a href="https://twitter.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-twitter"></i></a>
+                     </div>
+                </div>
 
             </div>
-
-            <div class="footer-divider"></div>
-
-            <p class="text-secondary small mb-0">
-                <b>&copy; 2026 ShopIQ Inc. All rights reserved.</b>
-            </p>
-
+            <hr class="border-secondary">
+            <div class="text-center small text-muted pb-3">
+                &copy; 2026 ShopIQ Inc. All rights reserved. with Designed <span class="text-primary"></span>.
+            </div>
         </div>
-
     </footer>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

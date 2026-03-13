@@ -1,72 +1,117 @@
-﻿    using EC.Data;
-    using EC.Helpers;
-    using EC.Models;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Claims;
+﻿using EC.Data;
+using EC.Helpers;
+using EC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 
-    namespace EC.Controllers
+namespace EC.Controllers
+{
+    [Authorize(Roles = "Seller")]
+    public class SellerController : Controller
     {
-        [Authorize(Roles = "Seller")]
-        public class SellerController : Controller
+        private readonly DbHelper _db;
+        private readonly EmailHelper _email;
+
+        public SellerController(DbHelper db, EmailHelper email)
         {
-            private readonly DbHelper _db;
-            private readonly EmailHelper _email;
+            _db = db;
+            _email = email;
+        }
+        // ================= HELPER =================
+        private int GetCurrentUserId()
+        {
+            var claim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
 
-            public SellerController(DbHelper db, EmailHelper email)
-            {
-                _db = db;
-                _email = email;
-            }
+            if (claim == null || !int.TryParse(claim.Value, out int userId))
+                throw new Exception("User not logged in");
 
-            // ================= HOME =================
-            public IActionResult Index()
-            {
-                return RedirectToAction("Dashboard");
-            }
+            return userId;
+        }
 
-            // ================= DASHBOARD =================
-            public IActionResult Dashboard()
-            {
-                int sellerId = GetCurrentUserId();
-                var model = _db.GetSellerDashboardData(sellerId);
-                return View(model);
-            }
+        // ================= HOME =================
+        public IActionResult Index()
+        {
+            return RedirectToAction("Dashboard");
+        }
 
-            // ================= PRODUCTS =================
-            public IActionResult Products()
-            {
-                int sellerId = GetCurrentUserId();
-                var products = _db.GetProductsBySeller(sellerId) ?? new List<Product>();
-                return View(products);
-            }
+        // ================= DASHBOARD =================
+        public IActionResult Dashboard()
+        {
+            int sellerId = GetCurrentUserId();
+            SellerDashboardViewModel model = _db.GetSellerDashboardData(sellerId);
+            return View(model);
+        }
 
-            // ================= ADD PRODUCT =================
-            public IActionResult Add()
+        // ================= PRODUCTS =================
+        public IActionResult Products()
+        {
+            int sellerId = GetCurrentUserId();
+            var products = _db.GetProductsBySeller(sellerId) ?? new List<Product>();
+            return View(products);
+        }
+
+        // ================= ADD PRODUCT =================
+        public IActionResult Add()
+        {
+            ViewBag.Categories = _db.GetCategories() ?? new List<Category>();
+            return View();
+        }
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Add(Product p)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        ViewBag.Categories = _db.GetCategories() ?? new List<Category>();
+        //        return View(p);
+        //    }
+
+        //    p.SellerId = GetCurrentUserId();
+        //    _db.AddProduct(p);
+
+        //    TempData["Success"] = "Product added successfully!";
+        //    return RedirectToAction("Products");
+        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Add(Product p, IFormFile imageFile)
+        {
+            if (!ModelState.IsValid)
             {
                 ViewBag.Categories = _db.GetCategories() ?? new List<Category>();
-                return View();
+                return View(p);
             }
 
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public IActionResult Add(Product p)
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
             {
-                if (!ModelState.IsValid)
+                string fileName = Path.GetFileName(imageFile.FileName);
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+
+                using (var stream = new FileStream(uploadPath, FileMode.Create))
                 {
-                    ViewBag.Categories = _db.GetCategories() ?? new List<Category>();
-                    return View(p);
+                    imageFile.CopyTo(stream);
                 }
 
-                p.SellerId = GetCurrentUserId();
-                _db.AddProduct(p);
-
-                TempData["Success"] = "Product added successfully!";
-                return RedirectToAction("Products");
+                p.Image = fileName;
             }
+            else
+            {
+                p.Image = "";
+            }
+
+            p.SellerId = GetCurrentUserId();
+
+            _db.AddProduct(p);
+
+            TempData["Success"] = "Product added successfully!";
+            return RedirectToAction("Products");
+        }
 
         // ================= EDIT PRODUCT =================
         public IActionResult Edit(int id)
@@ -103,7 +148,7 @@
             TempData["Success"] = "Product updated successfully!";
             return RedirectToAction("Products");
         }
-        //==================== order details =========================
+        //==================== Order details =========================
         public IActionResult OrderDetails(int id)
         {
             var items = _db.GetOrderItems(id);
@@ -130,9 +175,7 @@
         public IActionResult Orders()
         {
             int sellerId = GetCurrentUserId();
-
             var orders = _db.GetOrdersBySeller(sellerId);
-
             return View(orders);
         }
         //public IActionResult Orders()
@@ -143,10 +186,10 @@
         //        .Where(o => o.SellerId == sellerId)
         //        .Select(o => new OrderDetailViewModel
         //        {
-        //            ProductId = P.Id,
+        //            ProductId = p.Id,
         //            UserName = o.User.Name,
         //            OrderDate = o.OrderDate,
-        //            TotalAmount = o.TotalAmount,
+        //            Price = o.TotalAmount,
         //            PaymentMethod = o.PaymentMethod,
         //            Status = o.Status
         //        })
@@ -158,39 +201,31 @@
 
         // ================= PROFILE =================
         public IActionResult Profile()
-            {
-                int sellerId = GetCurrentUserId();
-                var user = _db.GetUserProfile(sellerId) ?? new User();  
-                return View(user);
-            }
-
-            [HttpPost]
-            [ValidateAntiForgeryToken]
-            public IActionResult Profile(User u)
-            {
-                int sellerId = GetCurrentUserId();
-
-                if (u.Id != sellerId)
-                    return Unauthorized();
-
-                if (!ModelState.IsValid)
-                    return View(u);
-
-                _db.UpdateUser(u);
-
-                TempData["Success"] = "Profile updated successfully!";
-                return RedirectToAction("Profile");
-            }
-
-            // ================= HELPER =================
-            private int GetCurrentUserId()
-            {
-                var claim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
-
-                if (claim == null || !int.TryParse(claim.Value, out int userId))
-                    throw new Exception("User not logged in");
-
-                return userId;
-            }
+        {
+            int sellerId = GetCurrentUserId();
+            var user = _db.GetUserProfile(sellerId) ?? new User();
+            return View(user);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Profile(User u)
+        {
+            int sellerId = GetCurrentUserId();
+
+            if (u.Id != sellerId)
+                return Unauthorized();
+
+            if (!ModelState.IsValid)
+                return View(u);
+
+            _db.UpdateUser(u);
+
+            TempData["Success"] = "Profile updated successfully!";
+            return RedirectToAction("Profile");
+        }
+
+
     }
+
+}

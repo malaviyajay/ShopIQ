@@ -90,6 +90,13 @@ namespace EC.Controllers
         }
 
         // ================= ORDERS =================
+        //public IActionResult Orders()
+        //{
+        //    int sellerId = GetCurrentUserId();
+        //    var orders = _db.GetOrdersBySeller(sellerId);
+        //    return View(orders);
+        //}
+
         public IActionResult Orders()
         {
             var orders = _db.GetAllOrders();

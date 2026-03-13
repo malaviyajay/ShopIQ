@@ -322,14 +322,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                           @*  @if (Model.RecentOrders != null && Model.RecentOrders.Any())
                             {
                                 foreach (var o in Model.RecentOrders.Take(5))
                                 {
                                     <tr>
                                         <td class="fw-medium">@o.ProductName</td>
                                         <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> @o.OrderDate.ToString("dd MMM yyyy")</td>
-                                        <td class="text-end fw-bold" style="color: #B12704;">₹@o.Amount.ToString("N0")</td>
+                                        <td class="text-end fw-bold" style="color: #B12704;">₹@o.TotalAmount.ToString("N0")</td>
                                     </tr>
                                 }
                             }
@@ -338,7 +338,7 @@
                                 <tr>
                                     <td colspan="3" class="text-center text-muted py-4">No recent orders</td>
                                 </tr>
-                            }
+                            } *@
                         </tbody>
                     </table>
                 </div>
