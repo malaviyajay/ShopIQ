@@ -69,7 +69,7 @@
         font-size: 0.9rem;
         text-decoration: none;
         transition: all 0.2s;
-        box-shadow: 0 2px 5px rgba(213,217,217,0.3);
+        box-shadow: 0 2px 5px rgba(213, 217, 217, 0.3);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -203,6 +203,31 @@
     .fw-medium {
         font-weight: 600;
     }
+ 
+    
+    .dashboard-section {
+        background: var(--white);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        height: 100%;
+        margin-bottom: 20px; 
+    }
+
+   
+    .admin-table th, .admin-table td {
+        padding: 15px 12px; 
+    }
+
+
+    .table-responsive {
+        margin-bottom: 15px; 
+    }
+
+    .col-lg-5, .col-lg-7 {
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="admin-dashboard">
@@ -215,65 +240,51 @@
             <a class="dash-btn dash-btn-primary" href="/Admin/Products"><i class="fas fa-plus"></i> Manage Products</a>
         </div>
     </div>
-
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div class="stat-info">
-                <h3>Total Products</h3>
-                <p>@Model.ProductCount</p>
-            </div>
-            <div class="stat-icon icon-blue"><i class="fas fa-box-open"></i></div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-info">
-                <h3>Total Orders</h3>
-                <p>@Model.OrderCount</p>
-            </div>
-            <div class="stat-icon icon-gray"><i class="fas fa-shopping-bag"></i></div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-info">
-                <h3>Total Users</h3>
-                <p>@Model.UserCount</p>
-            </div>
-            <div class="stat-icon icon-blue"><i class="fas fa-user-friends"></i></div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-info">
-                <h3>Revenue</h3>
-                <p>₹@Model.Revenue.ToString("N0")</p>
-            </div>
-            <div class="stat-icon icon-gold"><i class="fas fa-rupee-sign"></i></div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-info">
-                <h3>Profit</h3>
-                <p>₹@Model.Profit.ToString("N0")</p>
-            </div>
-            <div class="stat-icon icon-green"><i class="fas fa-arrow-trend-up"></i></div>
-        </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="dashboard-section">
-                <h3 class="section-title">Monthly Revenue & Profit</h3>
-                <canvas id="revenueChart" height="100"></canvas>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="dashboard-section">
-                <h3 class="section-title">Monthly Orders</h3>
-                <canvas id="ordersChart" height="220"></canvas>
-            </div>
-        </div>
-    </div>
+</div>
 
     <div class="row g-4">
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Products</h3>
+                    <p>@Model.ProductCount</p>
+                </div>
+                <div class="stat-icon icon-blue"><i class="fas fa-box-open"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Orders</h3>
+                    <p>@Model.OrderCount</p>
+                </div>
+                <div class="stat-icon icon-gray"><i class="fas fa-shopping-bag"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Total Users</h3>
+                    <p>@Model.UserCount</p>
+                </div>
+                <div class="stat-icon icon-blue"><i class="fas fa-user-friends"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Revenue</h3>
+                    <p>₹@Model.Revenue.ToString("N0")</p>
+                </div>
+                <div class="stat-icon icon-gold"><i class="fas fa-rupee-sign"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-info">
+                    <h3>Profit</h3>
+                    <p>₹@Model.Profit.ToString("N0")</p>
+                </div>
+                <div class="stat-icon icon-green"><i class="fas fa-arrow-trend-up"></i></div>
+            </div>
+        </div>
 
         <div class="col-lg-5">
             <div class="dashboard-section">
@@ -282,8 +293,8 @@
                     <table class="table admin-table mb-0">
                         <thead>
                             <tr>
-                                <th>Product Name</th>
-                                <th class="text-end">Total Sold</th>
+                               <b> <th>Product Name</th>
+                                <th class="text-end">Total Sold</th></b>
                             </tr>
                         </thead>
                         <tbody>
@@ -311,25 +322,26 @@
 
         <div class="col-lg-7">
             <div class="dashboard-section">
-                <h3 class="section-title">Recent Orders</h3>
+             <h3 class="section-title">Recent Orders</h3>
                 <div class="table-responsive">
                     <table class="table admin-table mb-0">
                         <thead>
                             <tr>
-                                <th>Product</th>
+                               <b> <th>Coustmer Name </th>
                                 <th>Order Date</th>
-                                <th class="text-end">Amount</th>
+                                <th class="text-end">Amount</th></b>
                             </tr>
                         </thead>
                         <tbody>
-                           @*  @if (Model.RecentOrders != null && Model.RecentOrders.Any())
+                            @if (Model.RecentOrders != null && Model.RecentOrders.Any())
                             {
                                 foreach (var o in Model.RecentOrders.Take(5))
                                 {
                                     <tr>
-                                        <td class="fw-medium">@o.ProductName</td>
-                                        <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> @o.OrderDate.ToString("dd MMM yyyy")</td>
-                                        <td class="text-end fw-bold" style="color: #B12704;">₹@o.TotalAmount.ToString("N0")</td>
+                                        <td class="fw-medium">@o.Name</td>
+                                        <td class="text-muted"><i class="far fa-calendar-alt me-1"></i> @o.OrderDate.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td class="text-end fw-bold" style="color: #B12704;">₹@o.Amount.ToString("N0")</td>
                                     </tr>
                                 }
                             }
@@ -338,7 +350,7 @@
                                 <tr>
                                     <td colspan="3" class="text-center text-muted py-4">No recent orders</td>
                                 </tr>
-                            } *@
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -347,61 +359,101 @@
 
     </div>
 
-</div>
+<div class="row mb-3"> 
+    <div class="col-md-3"> 
+        <label class="form-label">From Date</label> 
+        <input type="date" id="fromDate" class="form-control"> 
+    </div> 
+    <div class="col-md-3"> 
+        <label class="form-label">To Date</label> 
+        <input type="date" id="toDate" class="form-control"> 
+    </div> 
+    <div class="col-md-2 d-flex align-items-end"> 
+        <button class="btn btn-primary w-100" onclick="loadCharts()"> Filter </button> 
+    </div> 
+</div> 
+<div class="row g-4 mt-3"> 
+    <div class="col-lg-6"> 
+        <div class="dashboard-section"> 
+            <h3 class="section-title">Monthly Revenue & Profit</h3> 
+           <canvas id="revenueChart" style="height:300px;"></canvas>
+        </div> 
+    </div> 
+    <div class="col-lg-6"> 
+        <div class="dashboard-section"> 
+            <h3 class="section-title">Monthly Orders</h3> 
+           <canvas id="ordersChart" style="height:300px;"></canvas>
+        </div> 
+    </div> 
+</div> 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const revenueData = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyRevenue));
-    const profitData = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyProfit));
-    const ordersData = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyOrders));
+@section Scripts {
 
-    // Revenue & Profit Chart (Updated to Brand Colors)
-    new Chart(document.getElementById('revenueChart'), {
-        type: 'line',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [
-                {
-                    label: 'Revenue',
-                    data: revenueData,
-                    borderColor: '#007185',
-                    backgroundColor: 'rgba(0, 113, 133, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                },
-                {
-                    label: 'Profit',
-                    data: profitData,
-                    borderColor: '#007600',
-                    backgroundColor: 'rgba(0, 118, 0, 0.1)',
-                    fill: true,
-                    tension: 0.3
+    <script> 
+        let revenueChart; 
+        let ordersChart; 
+        document.addEventListener("DOMContentLoaded", async function () {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), 0, 1);
+
+            document.getElementById("fromDate").value = firstDay.toISOString().split('T')[0];
+            document.getElementById("toDate").value = today.toISOString().split('T')[0];
+
+            await loadCharts();
+        });
+
+
+        async function getChartData() {
+
+            const fromDate = document.getElementById("fromDate").value;
+            const toDate = document.getElementById("toDate").value;
+
+            try {
+                const response = await fetch(`/api/chart/seller-admin-dashboard?fromDate=${fromDate}&toDate=${toDate}`);
+
+                const data = await response.json();
+
+                return data;
+            } 
+            catch (ex) {
+                console.error(ex);
+                alert("Something went wrong");
+                return [];
+            }
+
+        }
+
+    
+        async function loadCharts() {
+
+            const data = await getChartData();
+
+            if (revenueChart) revenueChart.destroy();
+            if (ordersChart) ordersChart.destroy();
+
+            revenueChart = new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: {
+                    labels: data.map(x => x.month),
+                    datasets: [
+                        { label: 'Revenue', data: data.map(x => x.revenue) },
+                        { label: 'Profit', data: data.map(x => x.profit) }
+                    ]
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'top' } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+            });
 
-    // Orders Chart (Updated to Brand Colors)
-    new Chart(document.getElementById('ordersChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Orders',
-                data: ordersData,
-                backgroundColor: '#f7ca00',
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
+            ordersChart = new Chart(document.getElementById('ordersChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(x => x.month),
+                    datasets: [
+                        { label: 'Orders', data: data.map(x => x.orders) }
+                    ]
+                }
+            });
         }
-    });
-</script>
+    </script>
+ 
+
+}

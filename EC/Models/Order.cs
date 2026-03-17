@@ -12,8 +12,9 @@
     public string PaymentMethod { get; set; } = "";
     public string PaymentId { get; set; }
     public string Status { get; set; } = "";
+    public decimal Profit { get; set; }
 
         public List<OrderItem> Items { get; set; } = new();
 
     }
-    }
+}

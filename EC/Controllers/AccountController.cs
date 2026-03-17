@@ -22,7 +22,7 @@ public class AccountController : Controller
         _email = email;
     }
 
-    // ================= REGISTER =================
+    // ================= REGISTER ================
     public IActionResult Register() => View();
 
     [HttpPost]

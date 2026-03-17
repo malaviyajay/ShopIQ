@@ -151,7 +151,7 @@ namespace EC.Controllers
 
             while (reader.Read())
             {
-                int userId = reader["Id"] != DBNull.Value
+                int userId = reader["Id"] != DBNull.Value   
                     ? Convert.ToInt32(reader["Id"])
                     : 0;
 

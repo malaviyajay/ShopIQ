@@ -3,6 +3,7 @@ using EC.Helpers;
 using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -223,6 +224,75 @@ namespace EC.Controllers
 
             TempData["Success"] = "Profile updated successfully!";
             return RedirectToAction("Profile");
+        }
+
+        //=============== seller Monthly Revenue & Profit &&Monthly Orders chart =========
+        [HttpGet]
+        public IActionResult SellerDashboardChart(DateTime fromDate, DateTime toDate)
+        {
+            int sellerId = GetCurrentUserId();
+            // Generate months in range
+            var months = new List<string>();
+            var monthNumbers = new List<int>();
+            for (var dt = new DateTime(fromDate.Year, fromDate.Month, 1); dt <= toDate; dt = dt.AddMonths(1))
+            {
+                months.Add(dt.ToString("MMM"));
+                monthNumbers.Add(dt.Month);
+            }
+
+            decimal[] monthlyRevenue = new decimal[months.Count];
+            decimal[] monthlyProfit = new decimal[months.Count];
+            int[] monthlyOrders = new int[months.Count];
+
+            using (var conn = _db.GetConnection())
+            {
+                conn.Open();
+
+                string query = @"
+                        SELECT 
+                            MONTH(OrderDate) AS MonthNum,
+                            YEAR(OrderDate) AS YearNum, 
+                            ISNULL(SUM(TotalAmount), 0) AS Revenue,
+                            ISNULL(SUM(TotalAmount * 0.2), 0) AS Profit,
+                            COUNT(*) AS OrdersCount
+                        FROM Orders
+                        WHERE SellerId = @SellerId
+                          AND OrderDate BETWEEN @FromDate AND @ToDate
+                        GROUP BY YEAR(OrderDate), MONTH(OrderDate)
+                        ORDER BY YEAR(OrderDate), MONTH(OrderDate)";
+
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@SellerId", sellerId);
+                    cmd.Parameters.AddWithValue("@FromDate", fromDate);
+                    cmd.Parameters.AddWithValue("@ToDate", toDate);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int year = Convert.ToInt32(reader["YearNum"]);
+                            int month = Convert.ToInt32(reader["MonthNum"]);
+                            int index = months.FindIndex(m => m == new DateTime(year, month, 1).ToString("MMM"));
+
+                            if (index >= 0)
+                            {
+                                monthlyRevenue[index] = Convert.ToDecimal(reader["Revenue"]);
+                                monthlyProfit[index] = Convert.ToDecimal(reader["Profit"]);
+                                monthlyOrders[index] = Convert.ToInt32(reader["OrdersCount"]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Ok(new
+            {
+                months,
+                monthlyRevenue,
+                monthlyProfit,
+                monthlyOrders
+            });
         }
 
 

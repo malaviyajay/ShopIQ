@@ -5,6 +5,7 @@
         public int ProductCount { get; set; }
         public int Order { get; set; }
         public int LowStockCount { get; set; }
+        public List<Product> LowStockProducts { get; set; } = new List<Product>();
 
         public decimal Revenue { get; set; }
         public decimal Profit { get; set; }
@@ -13,7 +14,7 @@
         public List<decimal> MonthlyProfit { get; set; } = new();
         public List<int> MonthlyOrders { get; set; } = new();
 
-        // Updated
+
         public List<RecentOrder> Recentorders { get; set; } = new();
         public List<TopProduct> TopProducts { get; set; } = new();
 
@@ -33,7 +34,7 @@
 
     public class RecentOrder
     {
-        public string ProductName { get; set; } = "";
+        public string Name { get; set; } = "";
         public DateTime OrderDate { get; set; }
         public decimal Amount { get; set; }
     }

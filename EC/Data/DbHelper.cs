@@ -1069,7 +1069,7 @@ VALUES
             {
                 model.RecentOrders.Add(new RecentOrder
                 {
-                    ProductName = rr["UserName"].ToString() ?? "",
+                    Name = rr["UserName"].ToString() ?? "",
                     OrderDate = Convert.ToDateTime(rr["OrderDate"]),
                     Amount = Convert.ToDecimal(rr["TotalAmount"])
                 });
@@ -1169,178 +1169,178 @@ VALUES
             cmdOrder.ExecuteNonQuery();
         }
 
-        //================ seller dashbord ===================
-        public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
-        {
-            // Fetch products and orders
-            var products = GetProductsBySeller(sellerId);
-            var orders = GetOrdersBySeller(sellerId);
-
-            // Initialize dashboard model
-            var model = new SellerDashboardViewModel
+            //================ seller dashbord ===================
+            public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
             {
-                SellerId = sellerId,
-                SellerName = $"Seller {sellerId}",
-                ProductCount = products.Count,
-                Order = orders.Count,
-                Revenue = orders.Sum(o => o.TotalAmount),
-                LowStockCount = GetLowStockCountBySeller(sellerId),
-                Product = products,
-                Orders = orders
-            };
+                // Fetch products and orders
+                var products = GetProductsBySeller(sellerId);
+                var orders = GetOrdersBySeller(sellerId);
 
-            // Populate Top Selling Products (count orders per product)
-            model.TopProducts = orders
-                .Where(o => products.Any(p => p.Name == o.ProductName)) // Only seller's products
-                .GroupBy(o => o.ProductName)
-                .Select(g => new TopProduct
+                // Initialize dashboard model
+                var model = new SellerDashboardViewModel
                 {
-                    TopProductName = g.Key,
-                    TotalSold = g.Count() // Count of orders containing this product
-                })
-                .OrderByDescending(tp => tp.TotalSold)
-                .Take(5)
-                .ToList();
+                    SellerId = sellerId,
+                    SellerName = $"Seller {sellerId}",
+                    ProductCount = products.Count,
+                    Order = orders.Count,
+                    Revenue = orders.Sum(o => o.TotalAmount),
+                    LowStockCount = GetLowStockCountBySeller(sellerId),
+                    Product = products,
+                    Orders = orders
+                };
 
-            // Populate Recent Orders
-            model.Recentorders = orders
-                .OrderByDescending(o => o.OrderDate)
-                .Take(5)
-                .Select(o => new RecentOrder
-                {
-                    ProductName = o.ProductName,
-                    OrderDate = o.OrderDate,
-                    Amount = o.TotalAmount,
+                // Populate Top Selling Products (count orders per product)
+                model.TopProducts = orders
+                    .Where(o => products.Any(p => p.Name == o.ProductName)) // Only seller's products
+                    .GroupBy(o => o.ProductName)
+                    .Select(g => new TopProduct
+                    {
+                        TopProductName = g.Key,
+                        TotalSold = g.Count() // Count of orders containing this product
+                    })
+                    .OrderByDescending(tp => tp.TotalSold)
+                    .Take(5)
+                    .ToList();
+
+                // Populate Recent Orders
+                model.Recentorders = orders
+                    .OrderByDescending(o => o.OrderDate)
+                    .Take(5)
+                    .Select(o => new RecentOrder
+                    {
+                       Name = o.ProductName,
+                        OrderDate = o.OrderDate,
+                        Amount = o.TotalAmount,
                  
-                })
-                .ToList();
+                    })
+                    .ToList();
 
-            return model;
-        }
-
-        public List<Product> GetProductsBySeller(int sellerId)
-        {
-            var list = new List<Product>();
-            using var con = GetConnection();
-            con.Open();
-
-            var cmd = new SqlCommand("SELECT * FROM Products WHERE SellerId=@sid", con);
-            cmd.Parameters.AddWithValue("@sid", sellerId);
-
-            using var rd = cmd.ExecuteReader();
-            while (rd.Read())
-            {
-                list.Add(new Product
-                {
-                    Id = Convert.ToInt32(rd["Id"]),
-                    Name = Convert.ToString(rd["Name"]) ?? "",
-                    Price = Convert.ToDecimal(rd["Price"]),
-                    Image = Convert.ToString(rd["Image"]) ?? "",
-                    CategoryId = Convert.ToInt32(rd["CategoryId"]),
-                    Quantity = Convert.ToInt32(rd["Quantity"]),
-                    SellerId = Convert.ToInt32(rd["SellerId"])
-                });
+                return model;
             }
 
-            return list;
-        }
-        //============== low stock alert============
-        public int GetLowStockCountBySeller(int sellerId)
-        {
-            using var con = GetConnection();
-            con.Open();
-
-            var cmd = new SqlCommand(
-                "SELECT COUNT(*) FROM Products WHERE SellerId=@sid AND Quantity <= 5", con);
-
-            cmd.Parameters.AddWithValue("@sid", sellerId);
-
-            return Convert.ToInt32(cmd.ExecuteScalar());
-        }
-        //public List<Order> GetOrdersBySeller(int sellerId)
-        //{
-        //    var orders = new List<Order>();
-
-        //    using (var con = new SqlConnection(_con))
-        //    {
-        //        var cmd = new SqlCommand(@"
-        //            SELECT 
-        //                o.Id,
-        //                o.OrderDate,
-        //                o.TotalAmount,
-        //                u.Name AS CustomerName,
-        //                p.Name AS ProductName
-        //            FROM Orders o
-        //            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
-        //            INNER JOIN Products p ON oi.ProductId = p.Id
-        //            INNER JOIN Users u ON o.UserId = u.Id
-        //            WHERE p.SellerId = @SellerId
-        //            ORDER BY o.OrderDate DESC", con);
-
-        //        cmd.Parameters.AddWithValue("@SellerId", sellerId);
-
-        //        con.Open();
-        //        var reader = cmd.ExecuteReader();
-
-        //        while (reader.Read())
-        //        {
-        //            orders.Add(new Order
-        //            {
-        //                Id = Convert.ToInt32(reader["Id"]),
-        //                OrderDate = Convert.ToDateTime(reader["OrderDate"]),
-        //                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
-        //                ProductName = Convert.ToString(reader["ProductName"]),
-        //            });
-        //        }
-        //    }
-
-
-        //    return orders;
-        //}
-        public List<Order> GetOrdersBySeller(int sellerId)
-        {
-            var orders = new List<Order>();
-
-            using (var con = new SqlConnection(_con))
+            public List<Product> GetProductsBySeller(int sellerId)
             {
-                var cmd = new SqlCommand(@"
-        SELECT 
-            o.Id,
-            o.OrderDate,
-            o.TotalAmount,
-            o.Status,
-            o.PaymentMethod,
-            u.Name AS CustomerName,
-            p.Name AS ProductName
-        FROM Orders o
-        INNER JOIN OrderItems oi ON o.Id = oi.OrderId
-        INNER JOIN Products p ON oi.ProductId = p.Id
-        INNER JOIN Users u ON o.UserId = u.Id
-        WHERE p.SellerId = @SellerId
-        ORDER BY o.OrderDate DESC", con);
-
-                cmd.Parameters.AddWithValue("@SellerId", sellerId);
-
+                var list = new List<Product>();
+                using var con = GetConnection();
                 con.Open();
-                var reader = cmd.ExecuteReader();
 
-                while (reader.Read())
+                var cmd = new SqlCommand("SELECT * FROM Products WHERE SellerId=@sid", con);
+                cmd.Parameters.AddWithValue("@sid", sellerId);
+
+                using var rd = cmd.ExecuteReader();
+                while (rd.Read())
                 {
-                    orders.Add(new Order
+                    list.Add(new Product
                     {
-                        Id = Convert.ToInt32(reader["Id"]),
-                        OrderDate = Convert.ToDateTime(reader["OrderDate"]),
-                        TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
-                        Status = Convert.ToString(reader["Status"]),
-                        PaymentMethod = Convert.ToString(reader["PaymentMethod"]),
-                        ProductName = Convert.ToString(reader["ProductName"]),
-                        Name = Convert.ToString(reader["CustomerName"])
+                        Id = Convert.ToInt32(rd["Id"]),
+                        Name = Convert.ToString(rd["Name"]) ?? "",
+                        Price = Convert.ToDecimal(rd["Price"]),
+                        Image = Convert.ToString(rd["Image"]) ?? "",
+                        CategoryId = Convert.ToInt32(rd["CategoryId"]),
+                        Quantity = Convert.ToInt32(rd["Quantity"]),
+                        SellerId = Convert.ToInt32(rd["SellerId"])
                     });
                 }
+
+                return list;
+            }
+            //============== low stock alert============
+            public int GetLowStockCountBySeller(int sellerId)
+            {
+                using var con = GetConnection();
+                con.Open();
+
+                var cmd = new SqlCommand(
+                    "SELECT COUNT(*) FROM Products WHERE SellerId=@sid AND Quantity <= 5", con);
+
+                cmd.Parameters.AddWithValue("@sid", sellerId);
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            //public List<Order> GetOrdersBySeller(int sellerId)
+            //{
+            //    var orders = new List<Order>();
+
+            //    using (var con = new SqlConnection(_con))
+            //    {
+            //        var cmd = new SqlCommand(@"
+            //            SELECT 
+            //                o.Id,
+            //                o.OrderDate,
+            //                o.TotalAmount,
+            //                u.Name AS CustomerName,
+            //                p.Name AS ProductName
+            //            FROM Orders o
+            //            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
+            //            INNER JOIN Products p ON oi.ProductId = p.Id
+            //            INNER JOIN Users u ON o.UserId = u.Id
+            //            WHERE p.SellerId = @SellerId
+            //            ORDER BY o.OrderDate DESC", con);
+
+            //        cmd.Parameters.AddWithValue("@SellerId", sellerId);
+
+            //        con.Open();
+            //        var reader = cmd.ExecuteReader();
+
+            //        while (reader.Read())
+            //        {
+            //            orders.Add(new Order
+            //            {
+            //                Id = Convert.ToInt32(reader["Id"]),
+            //                OrderDate = Convert.ToDateTime(reader["OrderDate"]),
+            //                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
+            //                ProductName = Convert.ToString(reader["ProductName"]),
+            //            });
+            //        }
+            //    }
+
+
+            //    return orders;
+            //}
+            public List<Order> GetOrdersBySeller(int sellerId)
+            {
+                var orders = new List<Order>();
+
+                using (var con = new SqlConnection(_con))
+                {
+                    var cmd = new SqlCommand(@"
+            SELECT 
+                o.Id,
+                o.OrderDate,
+                o.TotalAmount,
+                o.Status,
+                o.PaymentMethod,
+                u.Name AS CustomerName,
+                p.Name AS ProductName
+            FROM Orders o
+            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
+            INNER JOIN Products p ON oi.ProductId = p.Id
+            INNER JOIN Users u ON o.UserId = u.Id
+            WHERE p.SellerId = @SellerId
+            ORDER BY o.OrderDate DESC", con);
+
+                    cmd.Parameters.AddWithValue("@SellerId", sellerId);
+
+                    con.Open();
+                    var reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        orders.Add(new Order
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            OrderDate = Convert.ToDateTime(reader["OrderDate"]),
+                            TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
+                            Status = Convert.ToString(reader["Status"]),
+                            PaymentMethod = Convert.ToString(reader["PaymentMethod"]),
+                            ProductName = Convert.ToString(reader["ProductName"]),
+                            Name = Convert.ToString(reader["CustomerName"])
+                        });
+                    }
+                }
+
+                return orders;
             }
 
-            return orders;
         }
-
     }
-}
