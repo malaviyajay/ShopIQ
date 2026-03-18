@@ -184,9 +184,10 @@
         <!-- LEFT IMAGE -->
         <div class="col-lg-5 col-md-6">
             <div class="image-container">
-                <img src="@Url.Content("~/images/products/" + Model.Image)"
+                <img src="@(string.IsNullOrEmpty(Model.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + Model.Image))"
                      class="product-image"
-                     alt="@Model.Name" />
+                     alt="@Model.Name"
+                     onerror="this.src='@Url.Content("~/images/green.jfif")'" />
             </div>
         </div>
 
@@ -246,9 +247,9 @@
                     </div>
 
                     <a asp-controller="Cart"
-                       asp-action="AddToCart"
-                       asp-route-id="@Model.Id"
-                       class="btn-add-cart mb-3">
+                           asp-action="AddToCart"
+                           asp-route-id="@Model.Id"
+                           class="btn-add-cart mb-3">
                         Add to Cart
                     </a>
                 }

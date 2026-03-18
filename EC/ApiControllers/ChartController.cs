@@ -7,7 +7,7 @@ using System.Data;
 
 namespace EC.ApiControllers
 {
-    [Route("api/[controller]")]
+   [Route("api/[controller]")]
     [ApiController]
     public class ChartController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace EC.ApiControllers
             _con = config.GetConnectionString("DefaultConnection");
         }
 
-        [Authorize(Roles = "Seller, Admin")]
+       [Authorize(Roles = "Seller, Admin")]
         [HttpGet("seller-admin-dashboard")]
         public IActionResult GetSellerDashboard(DateTime fromDate, DateTime toDate)
         {
@@ -46,7 +46,7 @@ namespace EC.ApiControllers
                     INNER JOIN OrderItems oi ON o.Id = oi.OrderId
                     INNER JOIN Products p ON p.Id = oi.ProductId
                     WHERE 1 = 1
-                    AND o.OrderDate BETWEEN @FromDate AND @ToDate
+                    AND Cast(o.OrderDate as date) BETWEEN @FromDate AND @ToDate
                     AND (ISNULL(@SellerId, 0) = 0 OR p.SellerId = @SellerId)
                     GROUP BY YEAR(o.OrderDate), MONTH(o.OrderDate)
                 ) q
@@ -76,7 +76,9 @@ namespace EC.ApiControllers
                                 ProductQuatitySold = x.Field<int?>("ProductQuatitySold") ?? default!,
                                 Orders = x.Field<int?>("OrdersCount") ?? default!,
                                 Profit = x.Field<decimal?>("Revenue") ?? default!,
+
                             }).ToList();
+
 
                             return Ok(result);
                         }
@@ -145,7 +147,7 @@ namespace EC.ApiControllers
                 SELECT 
                     DATENAME(WEEKDAY, OrderDate) AS Day,
                     SUM(TotalAmount) AS Revenue
-                FROM Orders
+                FROM Orders 
                 WHERE OrderDate >= DATEADD(DAY, -7, GETDATE())
                 " + (userId != null ? "AND UserId = @UserId" : "") + @"
                 GROUP BY DATENAME(WEEKDAY, OrderDate), DATEPART(WEEKDAY, OrderDate)

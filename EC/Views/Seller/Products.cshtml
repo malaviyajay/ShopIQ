@@ -258,6 +258,7 @@
                     <tr>
                         <th>Product Name</th>
                         <th>Price</th>
+                        <th>Image</th>
                         <th>Category</th>
                         <th style="width: 180px;">Actions</th>
                     </tr>
@@ -280,6 +281,9 @@
                                 <td class="product-name">@p.Name</td>
                                 <td>
                                     <span class="price-badge">₹@p.Price</span>
+                                </td>
+                                <td>
+                                    <img src="@Url.Content("~/images/" + p.Image)"width="60"height="60"style="object-fit:cover;border-radius:6px;" />
                                 </td>
                                 <td>
                                     <span class="category-badge">@p.CategoryId</span>

@@ -176,13 +176,10 @@
     }
     else
     {
-        
-    }
-    {
         <div class="row g-4">
             @foreach (var p in Model)
             {
-                var discount = 15;
+                var discount = 5;
                 var oldPrice = p.Price + (p.Price * discount / 100);
                 bool isOutOfStock = p.Quantity <= 0;
 
@@ -204,10 +201,10 @@
                                 </span>
                             }
 
-                            <img src="@Url.Content("~/images/products/" + p.Image)"
+                            <img src="@(string.IsNullOrEmpty(p.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + p.Image))"
                                  alt="@p.Name"
                                  class="product-img"
-                                 onerror="this.src='https://via.placeholder.com/250?text=Product'" />
+                                 onerror="this.src='@Url.Content("~/images/green.jfif")'" />
                         </div>
 
                         <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">
@@ -242,13 +239,13 @@
 
                                 @if (isOutOfStock)
                                 {
-                                    <button class="btn-add-cart"disabled    style="background:#ccc;cursor:not-allowed;">
+                                    <button class="btn-add-cart" disabled style="background:#ccc;cursor:not-allowed;">
                                         Out of Stock
                                     </button>
                                 }
                                 else
                                 {
-                                    <a asp-controller="Cart"asp-action="AddToCart"asp-route-id="@p.Id"class="btn-add-cart">
+                                    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@p.Id" class="btn-add-cart">
                                         Add to Cart
                                     </a>
                                 }

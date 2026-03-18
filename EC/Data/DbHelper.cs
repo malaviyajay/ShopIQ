@@ -254,30 +254,7 @@ namespace EC.Data
             return list;
         }
 
-        // ================= PRODUCTS =================
-
-        //    public void AddProduct(Product p)
-        //    {
-        //        using var con = GetConnection();
-        //        con.Open();
-
-
-        //        var cmd = new SqlCommand(@"
-        //INSERT INTO Products
-        //(Name, Price, Image, CategoryId, Quantity, SellerId)
-        //VALUES
-        //(@name, @price, @image, @categoryId, @quantity, @sellerId)
-        //", con);
-
-        //        cmd.Parameters.AddWithValue("@name", p.Name);
-        //        cmd.Parameters.AddWithValue("@price", p.Price);
-        //        cmd.Parameters.AddWithValue("@image", p.Image);
-        //        cmd.Parameters.AddWithValue("@categoryId", p.CategoryId);
-        //        cmd.Parameters.AddWithValue("@quantity", p.Quantity);
-        //        cmd.Parameters.AddWithValue("@sellerId", p.SellerId);
-
-        //        cmd.ExecuteNonQuery();
-        //    }
+        // ================= PRODUCTS ================
 
         public void AddProduct(Product p)
         {
@@ -617,29 +594,6 @@ VALUES
         }
 
         //================= update product =======================
-        //public void UpdateProduct(Product product)
-        //{
-        //    using var con = GetConnection();
-        //    con.Open();
-
-        //    var cmd = new SqlCommand(
-        //        @"UPDATE Products
-        //          SET Name = @name,
-        //              Price = @price,
-        //              Image = @image,
-        //              CategoryId = @category,
-        //              Quantity = @qty
-        //          WHERE Id = @id", con);
-
-        //    cmd.Parameters.AddWithValue("@name", product.Name);
-        //    cmd.Parameters.AddWithValue("@price", product.Price);
-        //    cmd.Parameters.AddWithValue("@image", product.Image);
-        //    cmd.Parameters.AddWithValue("@category", product.CategoryId);
-        //    cmd.Parameters.AddWithValue("@qty", product.Quantity);
-        //    cmd.Parameters.AddWithValue("@id", product.Id);
-
-        //    cmd.ExecuteNonQuery();
-        //}
 
         public void UpdateProduct(Product product)
         {
@@ -867,74 +821,7 @@ VALUES
 
             Console.WriteLine("Changes saved successfully.");
         }
-        //public List<OrderDetailViewModel> GetOrderItems(int orderId, int? userId = null)
-        //{
-        //    var items = new List<OrderDetailViewModel>();
-        //    using var con = GetConnection();
-        //    con.Open();
-
-        //    var sql = @"
-        //        SELECT OD.ProductId, OD.ProductName, OD.Quantity, OD.Price, U.Name AS UserName
-        //        FROM OrderItems OD
-        //        INNER JOIN Orders O ON O.Id = OD.OrderId
-        //        INNER JOIN Users U ON U.Id = O.UserId
-        //        WHERE OD.OrderId=@orderId";
-
-        //    if (userId.HasValue)
-        //        sql += " AND O.UserId=@userId";
-
-        //    var cmd = new SqlCommand(sql, con);
-        //    cmd.Parameters.AddWithValue("@orderId", orderId);
-        //    if (userId.HasValue)
-        //        cmd.Parameters.AddWithValue("@userId", userId.Value);
-
-        //    using var reader = cmd.ExecuteReader();
-        //    while (reader.Read())
-        //    {
-        //        items.Add(new OrderDetailViewModel
-        //        {
-        //            ProductId = Convert.ToInt32(reader["ProductId"]),
-        //            ProductName = Convert.ToString(reader["ProductName"]),
-        //            Quantity = Convert.ToInt32(reader["Quantity"]),
-        //            Price = Convert.ToDecimal(reader["Price"]),
-        //            UserName = Convert.ToString(reader["UserName"])
-        //        });
-        //    }
-        //    return items;
-        //}
-        //    public List<OrderDetailViewModel> GetOrderItems(int orderId)
-        //    {
-        //        var items = new List<OrderDetailViewModel>();
-
-        //        using var con = GetConnection();
-        //        con.Open();
-
-        //        var cmd = new SqlCommand(@"
-        //    SELECT ProductId, ProductName, Quantity, Price, U.Name AS UserName
-        //    FROM OrderItems OD
-        //    INNER JOIN Orders O ON O.Id = OD.OrderId
-        //    INNER JOIN Users U ON U.Id = O.UserId
-        //    WHERE OD.OrderId = @orderId
-        //", con);
-
-        //        cmd.Parameters.AddWithValue("@orderId", orderId);
-        //        cmd.Parameters.AddWithValue("@userId", UserId);
-
-        //        using var reader = cmd.ExecuteReader();
-        //        while (reader.Read())
-        //        {
-        //            items.Add(new OrderDetailViewModel
-        //            {
-        //                ProductId = Convert.ToInt32(reader["ProductId"]),
-        //                ProductName = Convert.ToString(reader["ProductName"]),
-        //                Quantity = Convert.ToInt32(reader["Quantity"]),
-        //                Price = Convert.ToDecimal(reader["Price"]),
-        //                UserName = Convert.ToString(reader["UserName"])
-        //            });
-        //        }
-
-        //        return items;
-        //    }
+       
         // ================= ORDER DETAILS (FINAL FIX) =================
         public List<OrderDetailViewModel> GetOrderItems(int orderId, int? userId = null)
         {
@@ -1257,46 +1144,7 @@ VALUES
 
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
-            //public List<Order> GetOrdersBySeller(int sellerId)
-            //{
-            //    var orders = new List<Order>();
-
-            //    using (var con = new SqlConnection(_con))
-            //    {
-            //        var cmd = new SqlCommand(@"
-            //            SELECT 
-            //                o.Id,
-            //                o.OrderDate,
-            //                o.TotalAmount,
-            //                u.Name AS CustomerName,
-            //                p.Name AS ProductName
-            //            FROM Orders o
-            //            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
-            //            INNER JOIN Products p ON oi.ProductId = p.Id
-            //            INNER JOIN Users u ON o.UserId = u.Id
-            //            WHERE p.SellerId = @SellerId
-            //            ORDER BY o.OrderDate DESC", con);
-
-            //        cmd.Parameters.AddWithValue("@SellerId", sellerId);
-
-            //        con.Open();
-            //        var reader = cmd.ExecuteReader();
-
-            //        while (reader.Read())
-            //        {
-            //            orders.Add(new Order
-            //            {
-            //                Id = Convert.ToInt32(reader["Id"]),
-            //                OrderDate = Convert.ToDateTime(reader["OrderDate"]),
-            //                TotalAmount = Convert.ToDecimal(reader["TotalAmount"]),
-            //                ProductName = Convert.ToString(reader["ProductName"]),
-            //            });
-            //        }
-            //    }
-
-
-            //    return orders;
-            //}
+      
             public List<Order> GetOrdersBySeller(int sellerId)
             {
                 var orders = new List<Order>();

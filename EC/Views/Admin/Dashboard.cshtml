@@ -376,7 +376,7 @@
     <div class="col-lg-6"> 
         <div class="dashboard-section"> 
             <h3 class="section-title">Monthly Revenue & Profit</h3> 
-           <canvas id="revenueChart" style="height:300px;"></canvas>
+           <canvas id="RevenueChart" style="height:300px;"></canvas>
         </div> 
     </div> 
     <div class="col-lg-6"> 
@@ -388,7 +388,8 @@
 </div> 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@section Scripts {
+
+       @section Scripts {
 
     <script> 
         let revenueChart; 
@@ -432,7 +433,7 @@
             if (revenueChart) revenueChart.destroy();
             if (ordersChart) ordersChart.destroy();
 
-            revenueChart = new Chart(document.getElementById('revenueChart'), {
+            revenueChart = new Chart(document.getElementById('RevenueChart'), {
                 type: 'line',
                 data: {
                     labels: data.map(x => x.month),
@@ -453,7 +454,8 @@
                 }
             });
         }
+       
     </script>
  
 
-}
+} 

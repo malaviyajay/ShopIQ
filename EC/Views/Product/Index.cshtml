@@ -215,13 +215,13 @@
                 <label><i class="fas fa-filter text-primary"></i> Filter by Category</label>
 
                 <select class="form-select-custom" onchange="window.location.href = this.value;">
-                    <option value='@Url.Action("Index", "Product")'>All Products</option>
+                    <option value='@Url.Action("Index")'>All Products</option>
 
                     @if (ViewBag.Categories != null)
                     {
                         foreach (var c in ViewBag.Categories)
                         {
-                            <option value='@Url.Action("Index", "Product", new { categoryId = c.Id })'
+                            <option value='@Url.Action("Index",  new { categoryId = c.Id })'
                                     selected="@(categoryID == c.Id)">
                                 @c.Name
                             </option>
@@ -262,10 +262,13 @@
                                         <span class="discount-badge">@discount% OFF</span>
                                     }
 
-                                    <img src="@Url.Content("~/images/products/" + p.Image)"
+                                  @*   <img src="@Url.Content("~/images/" + p.Image)"
                                          class="product-img"
                                          alt="@p.Name"
-                                         onerror="this.src='https://via.placeholder.com/250?text=Product'" />
+                                         onerror="this.src='https://via.placeholder.com/250?text=Product'" /> *@
+                                    <img src="@(string.IsNullOrEmpty(p.Image) ? "https://via.placeholder.com/250?text=Product" : Url.Content("~/images/" + p.Image))"
+                                         class="product-img"
+                                         alt="@p.Name" />
                                 </div>
 
                                 <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">

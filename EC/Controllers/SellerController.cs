@@ -91,19 +91,22 @@ namespace EC.Controllers
             // Handle image upload
             if (imageFile != null && imageFile.Length > 0)
             {
-                string fileName = Path.GetFileName(imageFile.FileName);
-                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
 
-                using (var stream = new FileStream(uploadPath, FileMode.Create))
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                string filePath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     imageFile.CopyTo(stream);
                 }
 
                 p.Image = fileName;
-            }
-            else
-            {
-                p.Image = "";
             }
 
             p.SellerId = GetCurrentUserId();
@@ -133,6 +136,7 @@ namespace EC.Controllers
             return View(product);
         }
         [HttpPost]
+
         public IActionResult Edit(Product p)
         {
             var existing = _db.GetProductById(p.Id);
