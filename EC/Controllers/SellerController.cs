@@ -4,10 +4,7 @@ using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+
 
 namespace EC.Controllers
 {
@@ -62,22 +59,6 @@ namespace EC.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Add(Product p)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        ViewBag.Categories = _db.GetCategories() ?? new List<Category>();
-        //        return View(p);
-        //    }
-
-        //    p.SellerId = GetCurrentUserId();
-        //    _db.AddProduct(p);
-
-        //    TempData["Success"] = "Product added successfully!";
-        //    return RedirectToAction("Products");
-        //}
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Add(Product p, IFormFile imageFile)
@@ -183,26 +164,7 @@ namespace EC.Controllers
             var orders = _db.GetOrdersBySeller(sellerId);
             return View(orders);
         }
-        //public IActionResult Orders()
-        //{
-        //    int sellerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-        //    var orders = _db.Orders
-        //        .Where(o => o.SellerId == sellerId)
-        //        .Select(o => new OrderDetailViewModel
-        //        {
-        //            ProductId = p.Id,
-        //            UserName = o.User.Name,
-        //            OrderDate = o.OrderDate,
-        //            Price = o.TotalAmount,
-        //            PaymentMethod = o.PaymentMethod,
-        //            Status = o.Status
-        //        })
-        //        .OrderByDescending(o => o.OrderDate)
-        //        .ToList();
-
-        //    return View(orders);
-        //}
+      
 
         // ================= PROFILE =================
         public IActionResult Profile()

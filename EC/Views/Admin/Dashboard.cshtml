@@ -395,12 +395,13 @@
         let revenueChart; 
         let ordersChart; 
         document.addEventListener("DOMContentLoaded", async function () {
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), 0, 1);
+           const year = new Date().getFullYear();
 
-            document.getElementById("fromDate").value = firstDay.toISOString().split('T')[0];
-            document.getElementById("toDate").value = today.toISOString().split('T')[0];
+const firstDay = new Date(year, 0, 1);   // Jan 1
+const lastDay = new Date(year, 11, 31);  // Dec 31
 
+document.getElementById("fromDate").value = firstDay.toISOString().split('T')[0];
+document.getElementById("toDate").value = lastDay.toISOString().split('T')[0];
             await loadCharts();
         });
 
@@ -426,34 +427,50 @@
         }
 
     
-        async function loadCharts() {
+       async function loadCharts() {
 
-            const data = await getChartData();
+    const data = await getChartData();
 
-            if (revenueChart) revenueChart.destroy();
-            if (ordersChart) ordersChart.destroy();
+    if (revenueChart) revenueChart.destroy();
+    if (ordersChart) ordersChart.destroy();
 
-            revenueChart = new Chart(document.getElementById('RevenueChart'), {
-                type: 'line',
-                data: {
-                    labels: data.map(x => x.month),
-                    datasets: [
-                        { label: 'Revenue', data: data.map(x => x.revenue) },
-                        { label: 'Profit', data: data.map(x => x.profit) }
-                    ]
+    const labels = data.map(x => x.month);
+
+    revenueChart = new Chart(document.getElementById('RevenueChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Revenue',
+                    data: data.map(x => x.revenue),
+                    borderWidth: 2,
+                    tension: 0.4
+                },
+                {
+                    label: 'Profit',
+                    data: data.map(x => x.profit),
+                    borderWidth: 2,
+                    tension: 0.4
                 }
-            });
-
-            ordersChart = new Chart(document.getElementById('ordersChart'), {
-                type: 'bar',
-                data: {
-                    labels: data.map(x => x.month),
-                    datasets: [
-                        { label: 'Orders', data: data.map(x => x.orders) }
-                    ]
-                }
-            });
+            ]
         }
+    });
+
+    ordersChart = new Chart(document.getElementById('ordersChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Orders',
+                    data: data.map(x => x.orders),
+                    borderWidth: 1
+                }
+            ]
+        }
+    });
+}
        
     </script>
  

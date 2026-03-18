@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace EC.Models
 {
     public class Products
@@ -17,7 +15,7 @@ namespace EC.Models
 
     public class DashboardViewModel
     {
-        // Summary
+       
         public int ProductCount { get; set; }
         public int OrderCount { get; set; }
         public int UserCount { get; set; }
@@ -28,12 +26,12 @@ namespace EC.Models
         public decimal UserGrowth { get; set; }
         public decimal ProductGrowth { get; set; }
 
-        // Charts
+   
         public List<decimal> MonthlyRevenue { get; set; } = new();
         public List<decimal> MonthlyProfit { get; set; } = new();
         public List<int> MonthlyOrders { get; set; } = new();
 
-        // Lists
+      
         public List<RecentOrder> RecentOrders { get; set; } = new();
         public List<TopCountry.TopProduct> TopProducts { get; set; } = new();
 
