@@ -34,6 +34,11 @@ namespace EC.Controllers
 
             var products = categoryId == null
                 ? _db.GetProducts()
+                  .GroupBy(p => p.CategoryId)
+            .SelectMany(g => g
+                .OrderBy(x => Guid.NewGuid()) // 🔥 RANDOM ORDER
+                .Take(2))
+            .ToList()
                 : _db.GetProductsByCategory(categoryId.Value);
 
             return View(products);

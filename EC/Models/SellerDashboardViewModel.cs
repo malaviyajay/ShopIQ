@@ -6,7 +6,7 @@
         public int Order { get; set; }
         public int LowStockCount { get; set; }
         public List<Product> LowStockProducts { get; set; } = new List<Product>();
-
+      
         public decimal Revenue { get; set; }
         public decimal Profit { get; set; }
 

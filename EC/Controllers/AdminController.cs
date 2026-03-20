@@ -120,7 +120,7 @@ namespace EC.Controllers
         // ================= SEARCH =================
         public IActionResult Search(string query)
         {
-            if (string.IsNullOrEmpty(query))
+            if (string.IsNullOrEmpty(query)) 
                 return RedirectToAction("Products");
 
             var products = _db.GetProductsWithCategoryNames()

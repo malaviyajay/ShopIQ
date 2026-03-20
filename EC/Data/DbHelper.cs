@@ -160,8 +160,8 @@ namespace EC.Data
             SELECT U.Id,
                    U.Name,
                    U.Email,
-                   ISNULL(P.Phone,'') AS Phone,
-                   ISNULL(P.Address,'') AS Address,
+                   U.Phone,
+                   U.Address,
                    U.StripeCustomerId
             FROM Users U
             LEFT JOIN UserProfiles P ON U.Id = P.UserId
@@ -184,7 +184,7 @@ namespace EC.Data
                 StripeCustomerId = Convert.ToString(dr["StripeCustomerId"]),
             };
         }
-        //=======================save profile data========================
+        //======================= save profile data========================
 
         public void SaveUserProfile(User model)
         {
@@ -202,13 +202,18 @@ namespace EC.Data
 
             //========================== Insert or Update UserProfiles table
             var cmd = new SqlCommand(@"
-        IF EXISTS (SELECT 1 FROM UserProfiles WHERE UserId=@uid)
-            UPDATE UserProfiles
-            SET Phone=@p, Address=@a
-            WHERE UserId=@uid
-        ELSE
-            INSERT INTO UserProfiles(UserId,Phone,Address)
-            VALUES(@uid,@p,@a)", con);
+                IF NOT EXISTS (SELECT 1 FROM UserProfiles WHERE UserId = @uid)
+                BEGIN
+                    INSERT INTO UserProfiles (UserId, Phone, Address)
+                    VALUES (@uid, @p, @a)
+                END
+                ELSE 
+                BEGIN
+                    UPDATE UserProfiles
+                    SET Phone = @p,
+                        Address = @a
+                    WHERE UserId = @uid
+                END", con);
 
             cmd.Parameters.AddWithValue("@uid", model.Id);
             cmd.Parameters.AddWithValue("@p", model.Phone ?? "");
@@ -1056,56 +1061,121 @@ VALUES
             cmdOrder.ExecuteNonQuery();
         }
 
-            //================ seller dashbord ===================
-            public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
+        //================ seller dashbord ===================
+        //    public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
+        //    {
+        //        var products = GetProductsBySeller(sellerId);
+        //        var orders = GetOrdersBySeller(sellerId);
+
+        //        var uniqueOrders = orders
+        //.GroupBy(o => o.Id)
+        //.Select(g => g.First())
+        //.ToList();
+
+        //        var revenue = uniqueOrders.Sum(o => o.TotalAmount);
+        //        var profit = revenue * 0.2m;
+
+        //        //var revenue = orders.Sum(o => o.TotalAmount);
+        //        //var profit = orders.Sum(o => o.TotalAmount * 0.2m);
+
+        //        var model = new SellerDashboardViewModel
+        //        {
+        //            SellerId = sellerId,
+        //            SellerName = $"Seller {sellerId}",
+        //            ProductCount = products.Count,
+        //            Order = orders.Count,
+        //            Revenue = revenue,
+        //            Profit = profit,
+        //            LowStockCount = GetLowStockCountBySeller(sellerId),
+        //            Product = products,
+        //            Orders = orders
+        //        };
+
+
+        //        // Populate Top Selling Products (count orders per product)
+        //        model.TopProducts = orders
+        //                .Where(o => products.Any(p => p.Name == o.ProductName)) // Only seller's products
+        //                .GroupBy(o => o.ProductName)
+        //                .Select(g => new TopProduct
+        //                {
+        //                    TopProductName = g.Key,
+        //                    TotalSold = g.Count() // Count of orders containing this product
+        //                })
+        //                .OrderByDescending(tp => tp.TotalSold)
+        //                .Take(5)
+        //                .ToList();
+
+        //            // Populate Recent Orders
+        //            model.Recentorders = orders
+        //                .OrderByDescending(o => o.OrderDate)
+        //                .Take(5)
+        //                .Select(o => new RecentOrder
+        //                {
+        //                   Name = o.ProductName,
+        //                    OrderDate = o.OrderDate,
+        //                    Amount = o.TotalAmount,
+
+        //                })
+        //                .ToList();
+
+        //            return model;
+        //        }
+        public SellerDashboardViewModel GetSellerDashboardData(int sellerId)
+        {
+            var products = GetProductsBySeller(sellerId);
+            var orders = GetOrdersBySeller(sellerId);
+
+            // ✅ FIX: remove duplicate orders
+            var uniqueOrders = orders
+                .GroupBy(o => o.Id)
+                .Select(g => g.First())
+                .ToList();
+
+            var revenue = uniqueOrders.Sum(o => o.TotalAmount);
+            var profit = revenue * 0.2m;
+
+            var model = new SellerDashboardViewModel
             {
-                // Fetch products and orders
-                var products = GetProductsBySeller(sellerId);
-                var orders = GetOrdersBySeller(sellerId);
+                SellerId = sellerId,
+                SellerName = $"Seller {sellerId}",
+                ProductCount = products.Count,
 
-                // Initialize dashboard model
-                var model = new SellerDashboardViewModel
+                Order = uniqueOrders.Count,   // ✅ FIXED
+                Revenue = revenue,            // ✅ FIXED
+                Profit = profit,              // ✅ FIXED
+
+                LowStockCount = GetLowStockCountBySeller(sellerId),
+                Product = products,
+                Orders = uniqueOrders         // ✅ FIXED
+            };
+
+            // Top Products
+            model.TopProducts = orders
+                .GroupBy(o => o.ProductName)
+                .Select(g => new TopProduct
                 {
-                    SellerId = sellerId,
-                    SellerName = $"Seller {sellerId}",
-                    ProductCount = products.Count,
-                    Order = orders.Count,
-                    Revenue = orders.Sum(o => o.TotalAmount),
-                    LowStockCount = GetLowStockCountBySeller(sellerId),
-                    Product = products,
-                    Orders = orders
-                };
+                    TopProductName = g.Key,
+                    TotalSold = g.Count()
+                })
+                .OrderByDescending(x => x.TotalSold)
+                .Take(5)
+                .ToList();
 
-                // Populate Top Selling Products (count orders per product)
-                model.TopProducts = orders
-                    .Where(o => products.Any(p => p.Name == o.ProductName)) // Only seller's products
-                    .GroupBy(o => o.ProductName)
-                    .Select(g => new TopProduct
-                    {
-                        TopProductName = g.Key,
-                        TotalSold = g.Count() // Count of orders containing this product
-                    })
-                    .OrderByDescending(tp => tp.TotalSold)
-                    .Take(5)
-                    .ToList();
+            // Recent Orders
+            model.Recentorders = uniqueOrders
+                .OrderByDescending(o => o.OrderDate)
+                .Take(5)
+                .Select(o => new RecentOrder
+                {
+                    Name = o.ProductName,
+                    OrderDate = o.OrderDate,
+                    Amount = o.TotalAmount
+                })
+                .ToList();
 
-                // Populate Recent Orders
-                model.Recentorders = orders
-                    .OrderByDescending(o => o.OrderDate)
-                    .Take(5)
-                    .Select(o => new RecentOrder
-                    {
-                       Name = o.ProductName,
-                        OrderDate = o.OrderDate,
-                        Amount = o.TotalAmount,
-                 
-                    })
-                    .ToList();
-
-                return model;
-            }
-
-            public List<Product> GetProductsBySeller(int sellerId)
+            return model;
+        }
+        public List<Product> GetProductsBySeller(int sellerId)
             {
                 var list = new List<Product>();
                 using var con = GetConnection();
@@ -1189,6 +1259,7 @@ VALUES
 
                 return orders;
             }
+      
 
-        }
+    }
     }

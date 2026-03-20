@@ -28,5 +28,6 @@ namespace EC.Models
 
         
         public List<UserRole> Roles { get; set; } = new();
+
     }
 }

@@ -2,7 +2,6 @@
 @inject IHttpContextAccessor HttpContextAccessor;
 @inject EC.Data.DbHelper _db;
 
-
 @{
     string homeController = "Home";
     string homeAction = "Index";
@@ -45,191 +44,308 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <style>
-
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --secondary: #64748b;
-            --dark: #0f172a;
-            --bg-body: #f8fafc;
-            --surface: rgba(255,255,255,0.9);
-            --border-color: #e2e8f0;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            background-image: radial-gradient(circle at top right,#e0e7ff 0%,transparent 20%),radial-gradient(circle at bottom left,#f1f5f9 0%,transparent 20%);
-            font-family: 'Plus Jakarta Sans',sans-serif;
-            color: var(--dark);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            letter-spacing: -0.01em;
-        }
-
-        .navbar {
-            background: var(--surface);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            padding: .75rem 0;
-            transition: .3s;
-        }
-
-        .brand {
-            font-weight: 800;
-            font-size: 1.6rem;
-            letter-spacing: -1px;
-            background: linear-gradient(135deg,var(--primary),#a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .search-container {
-            position: relative;
-            max-width: 450px;
-            width: 100%;
-            margin: 0 1.5rem;
-        }
-
-        .search-input {
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: .6rem 1rem .6rem 2.8rem;
-            font-size: .9rem;
-            background: #f1f5f9;
-        }
-
-            .search-input:focus {
-                background: #fff;
-                box-shadow: 0 0 0 4px rgba(99,102,241,.1);
-                border-color: var(--primary);
+            :root {
+                --primary: #6366f1;
+                --primary-hover: #4f46e5;
+                --secondary: #64748b;
+                --dark: #0f172a;
+                --bg-body: #f8fafc;
+                --surface: rgba(255,255,255,0.9);
+                --border-color: #e2e8f0;
             }
 
-        .search-icon-btn {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary);
-            border: none;
-            background: none;
-            pointer-events: none;
-        }
-
-        .btn-search-submit {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 4px 12px;
-            border-radius: 8px;
-        }
-
-        .nav-link {
-            font-weight: 600;
-            font-size: .95rem;
-            color: var(--secondary) !important;
-            padding: .5rem 1rem !important;
-            border-radius: 8px;
-        }
-
-            .nav-link:hover {
-                color: var(--primary) !important;
-                background: rgba(99,102,241,.05);
+            body {
+                background-color: var(--bg-body);
+                background-image: radial-gradient(circle at top right,#e0e7ff 0%,transparent 20%),radial-gradient(circle at bottom left,#f1f5f9 0%,transparent 20%);
+                font-family: 'Plus Jakarta Sans',sans-serif;
+                color: var(--dark);
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                letter-spacing: -0.01em;
             }
 
-        .nav-icon-link {
-            width: 42px;
-            height: 42px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            background: #f1f5f9;
-            color: var(--dark);
-            transition: .2s;
-        }
-
-            .nav-icon-link:hover {
-                background: var(--primary);
-                color: #fff !important;
-                transform: translateY(-2px);
+            .navbar {
+                background: var(--surface);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-color);
+                padding: .75rem 0;
+                transition: .3s;
             }
 
-        .account-toggle {
-            background: #f1f5f9;
-            padding: 6px 14px;
-            border-radius: 12px;
-            border: 1px solid transparent;
-        }
-
-            .account-toggle:hover {
-                background: #fff;
-                border-color: var(--border-color);
+            .brand {
+                font-weight: 800;
+                font-size: 1.6rem;
+                letter-spacing: -1px;
+                background: linear-gradient(135deg,var(--primary),#a855f7);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
             }
 
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,.1);
-            border-radius: 14px;
-            padding: .75rem;
-            margin-top: 10px !important;
-        }
+            .search-container {
+                position: relative;
+                max-width: 450px;
+                width: 100%;
+                margin: 0 1.5rem;
+            }
 
-        .dropdown-item {
-            border-radius: 8px;
-            padding: .6rem 1rem;
-            font-weight: 500;
-        }
+            .search-input {
+                border-radius: 12px;
+                border: 1px solid var(--border-color);
+                padding: .6rem 1rem .6rem 2.8rem;
+                font-size: .9rem;
+                background: #f1f5f9;
+            }
 
-        main {
-            flex: 1;
-            padding-bottom: 4rem;
-        }
+                .search-input:focus {
+                    background: #fff;
+                    box-shadow: 0 0 0 4px rgba(99,102,241,.1);
+                    border-color: var(--primary);
+                }
 
-        .social-footer {
-            background: var(--dark);
-            color: #fff;
-            padding: 4rem 0 2rem 0;
-            border-top-left-radius: 40px;
-            border-top-right-radius: 40px;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+            .search-icon-btn {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--secondary);
+                border: none;
+                background: none;
+                pointer-events: none;
+            }
 
-        .social-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 8px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
+            .btn-search-submit {
+                position: absolute;
+                right: 6px;
+                top: 50%;
+                transform: translateY(-50%);
+                padding: 4px 12px;
+                border-radius: 8px;
+            }
 
-            .social-btn:hover {
+            .nav-link {
+                font-weight: 600;
+                font-size: .95rem;
+                color: var(--secondary) !important;
+                padding: .5rem 1rem !important;
+                border-radius: 8px;
+            }
+
+                .nav-link:hover {
+                    color: var(--primary) !important;
+                    background: rgba(99,102,241,.05);
+                }
+
+            .nav-icon-link {
+                width: 42px;
+                height: 42px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 10px;
+                background: #f1f5f9;
+                color: var(--dark);
+                transition: .2s;
+            }
+
+                .nav-icon-link:hover {
+                    background: var(--primary);
+                    color: #fff !important;
+                    transform: translateY(-2px);
+                }
+
+            .account-toggle {
+                background: #f1f5f9;
+                padding: 6px 14px;
+                border-radius: 12px;
+                border: 1px solid transparent;
+            }
+
+                .account-toggle:hover {
+                    background: #fff;
+                    border-color: var(--border-color);
+                }
+
+            .dropdown-menu {
+                border: none;
+                box-shadow: 0 10px 25px rgba(0,0,0,.1);
+                border-radius: 14px;
+                padding: .75rem;
+                margin-top: 10px !important;
+            }
+
+            .dropdown-item {
+                border-radius: 8px;
+                padding: .6rem 1rem;
+                font-weight: 500;
+            }
+
+            main {
+                flex: 1;
+                padding-bottom: 4rem;
+            }
+
+            .social-footer {
+                background: var(--dark);
+                color: #fff;
+                padding: 4rem 0 2rem 0;
+                border-top-left-radius: 40px;
+                border-top-right-radius: 40px;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+            }
+
+            .social-btn {
+                width: 45px;
+                height: 45px;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.05);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 8px;
+                color: #fff;
+                text-decoration: none;
+                font-size: 1.2rem;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                transition: all 0.3s ease;
+            }
+
+                .social-btn:hover {
+                    background: var(--primary);
+                    color: #fff;
+                    transform: translateY(-5px);
+                    border-color: var(--primary);
+                }
+
+            .footer-divider {
+                height: 1px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 2rem 0;
+            }
+
+            /* ---------------- Chat Box Styles ---------------- */
+            #chatToggleBtn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 9999;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
                 background: var(--primary);
                 color: #fff;
-                transform: translateY(-5px);
-                border-color: var(--primary);
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
             }
 
-        .footer-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 2rem 0;
-        }
+            #chatContainer {
+                position: fixed;
+                bottom: 90px;
+                right: 20px;
+                width: 350px;
+                max-height: 450px;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+                display: none;
+                flex-direction: column;
+                overflow: hidden;
+                z-index: 9998;
+            }
 
+            #chatHeader {
+                background: var(--primary);
+                color: #fff;
+                padding: 12px 15px;
+                font-weight: 600;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            #chatMessages {
+                flex: 1;
+                padding: 10px 15px;
+                overflow-y: auto;
+                background: #f5f5f5;
+            }
+
+            .chat-message {
+                margin-bottom: 10px;
+                display: flex;
+                flex-direction: column;
+            }
+
+                .chat-message.admin {
+                    align-items: flex-start;
+                }
+
+                .chat-message.user {
+                    align-items: flex-end;
+                }
+
+                .chat-message .msg-content {
+                    padding: 8px 12px;
+                    border-radius: 12px;
+                    max-width: 75%;
+                    word-wrap: break-word;
+                }
+
+                .chat-message.admin .msg-content {
+                    background: #e0e0e0;
+                    color: #000;
+                }
+
+                .chat-message.user .msg-content {
+                    background: var(--primary);
+                    color: #fff;
+                }
+
+                .chat-message .msg-time {
+                    font-size: 0.7rem;
+                    color: #666;
+                    margin-top: 2px;
+                }
+
+            #chatInputContainer {
+                display: flex;
+                border-top: 1px solid #ddd;
+            }
+
+            #chatInput {
+                flex: 1;
+                border: none;
+                padding: 10px 12px;
+                font-size: 0.9rem;
+                outline: none;
+            }
+
+            #chatSendBtn {
+                background: var(--primary);
+                color: #fff;
+                border: none;
+                padding: 0 16px;
+                cursor: pointer;
+            }
+
+            @@media (max-width: 576px) {
+                #chatContainer {
+                    width: 90%;
+                    right: 5%;
+                }
+            }
+            /* ---------------- End Chat Box Styles ---------------- */
     </style>
 </head>
 
 <body>
-
+    
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
 
@@ -277,7 +393,7 @@
                     @if (User.Identity!.IsAuthenticated && User.IsInRole("Customer"))
                     {
                         <a asp-controller="Cart" asp-action="Index"
-                           class="nav-icon-link text-decoration-none position-relative">
+                               class="nav-icon-link text-decoration-none position-relative">
 
                             <i class="bi bi-handbag-fill fs-5"></i>
 
@@ -292,8 +408,8 @@
                     <div class="dropdown">
 
                         <a href="#"
-                           class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
-                           data-bs-toggle="dropdown">
+                               class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
+                               data-bs-toggle="dropdown">
 
                             <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
                             <span class="d-none d-sm-inline">Account</span>
@@ -321,7 +437,7 @@
 
                             <li>
                                 <a asp-controller="Account" asp-action="Logout"
-                                   class="dropdown-item text-danger">
+                                       class="dropdown-item text-danger">
                                     <i class="bi bi-box-arrow-right me-2"></i> Logout
                                 </a>
                             </li>
@@ -335,8 +451,8 @@
                         <div class="dropdown">
 
                             <a href="#"
-                               class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
-                               data-bs-toggle="dropdown">
+                                   class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
+                                   data-bs-toggle="dropdown">
 
                                 <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
                                 <span class="d-none d-sm-inline">Switch Role</span>
@@ -359,9 +475,9 @@
                                     {
                                         <li>
                                             <a class="dropdown-item"
-                                               asp-controller="Role"
-                                               asp-action="ChangeRole"
-                                               asp-route-roleId="@item.RoleId">
+                                                   asp-controller="Role"
+                                                   asp-action="ChangeRole"
+                                                   asp-route-roleId="@item.RoleId">
                                                 <i class="bi bi-person me-2"></i> @item.Name
                                             </a>
                                         </li>
@@ -380,6 +496,7 @@
     <main class="container mt-4 pt-2">
         @RenderBody()
     </main>
+
     <footer class="footer bg-dark text-light pt-5">
         <div class="container">
             <div class="row">
@@ -394,7 +511,7 @@
                         <a href="https://www.instagram.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
                         <a href="https://www.youtube.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-youtube"></i></a>
                         <a href="https://twitter.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-twitter"></i></a>
-                     </div>
+                    </div>
                 </div>
 
             </div>
@@ -405,31 +522,92 @@
         </div>
     </footer>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
-
-        function loadCartCount(){
-
-        const cart=document.getElementById("cartCount");
-        if(!cart)return;
-
+        // Cart count
+        function loadCartCount() {
+        const cart = document.getElementById("cartCount");
+        if (!cart) return;
         fetch('/Cart/CartCount')
-        .then(response=>response.text())
-        .then(data=>{
-        cart.innerText=data;
+        .then(response => response.text())
+        .then(data => { cart.innerText = data; });
+        }
+        loadCartCount();
+    </script>
+
+    <!-- ================= Right-side Chat Box ================= -->
+    <!-- Chat toggle button -->
+    <button id="chatToggleBtn"><i class="bi bi-chat-dots"></i></button>
+
+    <!-- Chat container -->
+    <div id="chatContainer">
+        <div id="chatHeader">
+            Chat Support
+            <span id="chatCloseBtn" style="cursor:pointer;">&times;</span>
+        </div>
+        <div id="chatMessages"></div>
+        <div id="chatInputContainer">
+            <input type="text" id="chatInput" placeholder="Type a message..." />
+            <button id="chatSendBtn"><i class="bi bi-send-fill"></i></button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+    <script>
+        const chatToggleBtn = document.getElementById('chatToggleBtn');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatCloseBtn = document.getElementById('chatCloseBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+
+        // Toggle chat window
+        chatToggleBtn.addEventListener('click', () => {
+        chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
+        chatContainer.style.flexDirection = 'column';
         });
 
-        }
+        chatCloseBtn.addEventListener('click', () => chatContainer.style.display = 'none');
 
-        loadCartCount();
+        // SignalR setup
+        const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 
+        connection.on("ReceiveMessage", (user, message, time) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-message ${user === 'Admin' ? 'admin' : 'user'}`;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'msg-content';
+        contentDiv.textContent = message;
+
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'msg-time';
+        timeDiv.textContent = time || new Date().toLocaleTimeString();
+
+        msgDiv.appendChild(contentDiv);
+        msgDiv.appendChild(timeDiv);
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        chatSendBtn.addEventListener('click', () => {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+        connection.invoke("SendMessage", "Customer", msg, new Date().toLocaleTimeString());
+        chatInput.value = '';
+        });
+
+        chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') chatSendBtn.click();
+        });
     </script>
+    <!-- ================= End Right-side Chat Box ================= -->
 
 </body>
 </html>
