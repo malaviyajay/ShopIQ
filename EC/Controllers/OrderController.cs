@@ -23,38 +23,121 @@ namespace EC.Controllers
         }
 
         [HttpGet]
+        //        public IActionResult GetOrderDetails(int id)
+        //        {
+        //            int userId = HttpContext.UserId() ?? 0;
+        //            var items = _db.GetOrderItems(id, userId);
+
+        //            if (!items.Any())
+        //                return Content("<div>No products found for this order.</div>", "text/html");
+
+        //            var status = items.FirstOrDefault()?.Status ?? "Pending";
+
+        //            decimal orderTotal = items.Sum(x => x.Price * x.Quantity);
+
+        //            string html = $@"
+        //        <div style='margin-bottom:10px;'>
+        //            <strong>Status:</strong> 
+        //           <span style='color:{(status == "Delivered" ? "green" : status == "Shipped" ? "blue" : "orange")}'>
+        //    {status}
+        //</span>
+        //        </div>
+
+        //        <table style='width:100%; border-collapse: collapse;'>
+        //        <thead>
+        //            <tr style='background:#f3f4f6;'>
+        //                <th style='padding:8px; border:1px solid #ddd;'>Product</th>
+        //                <th style='padding:8px; border:1px solid #ddd;'>Qty</th>
+        //                <th style='padding:8px; border:1px solid #ddd;'>Price</th>
+        //                <th style='padding:8px; border:1px solid #ddd;'>Total</th>
+        //            </tr>
+        //        </thead>
+        //        <tbody>";
+
+        //            foreach (var item in items)
+        //            {
+        //                decimal total = item.Price * item.Quantity;
+
+        //                html += $@"
+        //            <tr>
+        //                <td style='padding:8px; border:1px solid #ddd;'>{item.ProductName}</td>
+        //                <td style='padding:8px; border:1px solid #ddd;'>{item.Quantity}</td>
+        //                <td style='padding:8px; border:1px solid #ddd;'>₹{item.Price}</td>
+        //                <td style='padding:8px; border:1px solid #ddd;'>₹{total}</td>
+        //            </tr>";
+        //            }
+
+        //            html += $@"
+        //        </tbody>
+        //        </table>
+
+        //        <div style='margin-top:15px; font-weight:bold; text-align:right;'>
+        //            Total: ₹{orderTotal}
+        //        </div>";
+
+        //            return Content(html, "text/html");
+        //        }
+        [HttpGet]
         public IActionResult GetOrderDetails(int id)
         {
             int userId = HttpContext.UserId() ?? 0;
-            var items = _db.GetOrderItems(id, userId); // filter by logged-in user
+            var items = _db.GetOrderItems(id, userId);
+
             if (!items.Any())
                 return Content("<div>No products found for this order.</div>", "text/html");
 
+            var status = items.FirstOrDefault()?.Status ?? "Pending";
+
             decimal orderTotal = items.Sum(x => x.Price * x.Quantity);
 
-            string html = "<table style='width:100%; border-collapse: collapse;'>" +
-                          "<thead><tr style='background:#f3f4f6;'>" +
-                          "<th style='padding:8px; border:1px solid #ddd;'>Product</th>" +
-                          "<th style='padding:8px; border:1px solid #ddd;'>Qty</th>" +
-                          "<th style='padding:8px; border:1px solid #ddd;'>Price</th>" +
-                          "<th style='padding:8px; border:1px solid #ddd;'>Total</th>" +
-                          "</tr></thead><tbody>";
+            string html = $@"
+        <div style='margin-bottom:10px;'>
+            <strong>Status:</strong> 
+            <span style='color:green; font-weight:bold;'>{status}</span>
+        </div>
+
+        <table style='width:100%; border-collapse: collapse;'>
+        <thead>
+            <tr style='background:#f3f4f6;'>
+                <th style='padding:8px; border:1px solid #ddd;'>Product</th>
+                <th style='padding:8px; border:1px solid #ddd;'>Qty</th>
+                <th style='padding:8px; border:1px solid #ddd;'>Price</th>
+                <th style='padding:8px; border:1px solid #ddd;'>Total</th>
+            </tr>
+        </thead>
+        <tbody>";
 
             foreach (var item in items)
             {
                 decimal total = item.Price * item.Quantity;
-                html += $"<tr>" +
-                        $"<td style='padding:8px; border:1px solid #ddd;'>{item.ProductName}</td>" +
-                        $"<td style='padding:8px; border:1px solid #ddd;'>{item.Quantity}</td>" +
-                        $"<td style='padding:8px; border:1px solid #ddd;'>₹{item.Price}</td>" +
-                        $"<td style='padding:8px; border:1px solid #ddd;'>₹{total}</td>" +
-                        $"</tr>";
+
+                html += $@"
+            <tr>
+                <td style='padding:8px; border:1px solid #ddd;'>{item.ProductName}</td>
+                <td style='padding:8px; border:1px solid #ddd;'>{item.Quantity}</td>
+                <td style='padding:8px; border:1px solid #ddd;'>₹{item.Price}</td>
+                <td style='padding:8px; border:1px solid #ddd;'>₹{total}</td>
+            </tr>";
             }
 
-            html += $"</tbody></table>" +
-                    $"<div style='margin-top:15px; font-weight:bold; text-align:right;'>Total: ₹{orderTotal}</div>";
+            html += $@"
+        </tbody>
+        </table>
+
+        <div style='margin-top:15px; font-weight:bold; text-align:right;'>
+            Total: ₹{orderTotal}
+        </div>";
 
             return Content(html, "text/html");
+        }
+        // ================= UPDATE ORDER STATUS =================
+        [HttpPost]
+        public IActionResult UpdateOrderStatus(int orderId, string status)
+        {
+            _db.UpdateOrderStatus(orderId, status);
+
+            TempData["Success"] = "Order status updated successfully!";
+            return RedirectToAction("Index");
         }
 
     }

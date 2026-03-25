@@ -3,8 +3,8 @@ using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-
-
+using System.Linq;
+using System.Collections.Generic;
 
 namespace EC.Controllers
 {
@@ -33,6 +33,18 @@ namespace EC.Controllers
             ViewBag.Categories = _db.GetCategories();
             SetCartCount();
 
+            // ====== Ratings Integration (all reviews now included) ======
+            var reviews = _db.GetAllReviews(); // Get all reviews
+            ViewBag.ProductRatings = products.ToDictionary(
+                p => p.Id,
+                p => new
+                {
+                    Avg = reviews.Where(r => r.ProductId == p.Id)
+                                 .DefaultIfEmpty().Average(r => r?.Rating ?? 0),
+                    Total = reviews.Count(r => r.ProductId == p.Id)
+                }
+            );
+
             return View(products);
         }
 
@@ -44,6 +56,14 @@ namespace EC.Controllers
             if (product == null) return NotFound();
 
             SetCartCount();
+
+            // Get all reviews for this product
+            var reviews = _db.GetAllReviews()?.Where(r => r.ProductId == id).ToList() ?? new List<Review>();
+
+            ViewBag.AvgRating = reviews.Any() ? reviews.Average(r => (double)r.Rating) : 0;
+            ViewBag.TotalRatings = reviews.Count;
+            ViewBag.Reviews = reviews; // pass reviews directly
+
             return View(product);
         }
 
@@ -67,7 +87,6 @@ namespace EC.Controllers
             }
 
             int sellerId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
             model.SellerId = sellerId;
 
             _db.AddProduct(model);
@@ -97,7 +116,7 @@ namespace EC.Controllers
                 return View(model);
             }
 
-            _db.UpdateProduct(model); 
+            _db.UpdateProduct(model);
             return RedirectToAction("Index");
         }
 
@@ -118,6 +137,28 @@ namespace EC.Controllers
                 count = cart.Split(',').Length;
 
             ViewBag.CartCount = count;
+        }
+
+        // =================== Submit Rating ===================
+        [HttpPost]
+        [Authorize(Roles = "Customer")]
+        public IActionResult SubmitRating(int productId, int rating, string comment)
+        {
+            int userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            var review = new Review
+            {
+                ProductId = productId,
+                UserId = userId,
+                Rating = rating,
+                Comment = comment,
+                Status = "Approved" // Auto-approved
+            };
+
+            _db.AddReview(review);
+
+            TempData["Message"] = "Thank you! Your review has been submitted.";
+            return RedirectToAction("Details", new { id = productId });
         }
     }
 }

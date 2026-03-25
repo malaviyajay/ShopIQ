@@ -25,199 +25,63 @@
         --info-text: #055160;
     }
 
-    body {
-        background: var(--bg-light);
-        font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        color: var(--text-main);
-    }
-
-    .orders-container {
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 40px 15px;
-    }
-
-    /* ===== HEADER ===== */
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-
-    .dash-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-main);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* ===== MAIN CARD ===== */
-    .dashboard-card {
-        background: var(--white);
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        overflow: hidden;
-    }
-
-    /* ===== TABLE STYLES ===== */
-    .table-wrapper {
-        padding: 20px 25px;
-    }
-
-    .admin-table {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-        .admin-table th {
-            background: transparent;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            border-bottom: 2px solid var(--border-color);
-            padding: 15px 10px;
-        }
-
-        .admin-table td {
-            vertical-align: middle;
-            padding: 15px 10px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
-
-        .admin-table tr:hover td {
-            background-color: var(--bg-light);
-        }
-
-    .order-id {
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    /* ===== BADGES ===== */
-    .status-badge {
-        padding: 5px 10px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .badge-cod {
-        background: var(--warning-bg);
-        color: var(--warning-text);
-    }
-
-    .badge-online {
-        background: var(--success-bg);
-        color: var(--success-text);
-    }
-
-    .badge-status {
-        background: var(--info-bg);
-        color: var(--info-text);
-    }
-
-    /* ===== BUTTONS ===== */
-    .btn-view {
-        background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        padding: 6px 14px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-
-        .btn-view:hover {
-            background: var(--primary-color);
-            color: var(--white);
-        }
-
-    /* ===== INVOICE MODAL CSS (Used by JS) ===== */
-    .invoice-card {
-        background: var(--white);
-        padding: 20px;
-    }
-
-    .invoice-header {
-        border-bottom: 2px solid var(--border-color);
-        padding-bottom: 20px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .invoice-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-main);
-        margin-bottom: 10px;
-    }
-
-    .invoice-user-details p {
-        margin: 0 0 5px 0;
-        font-size: 0.95rem;
-        color: var(--text-muted);
-    }
-
-    .invoice-table th {
-        background: var(--bg-light);
-        color: var(--text-muted);
-        font-weight: 600;
-        border-bottom: none;
-    }
-
-    .invoice-summary-row {
-        background: var(--bg-light);
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-    .btn-update {
-        background: #ffd814;
-        border: 1px solid #fcd200;
-        color: #111;
-        border-radius: 6px;
-        padding: 6px 14px;
-        font-weight: 600;
-        font-size: 13px;
-    }
-
-        .btn-update:hover {
-            background: #f7ca00;
-        }
-
-    .btn-back {
-        background: #ffd814;
-        border: 1px solid #fcd200;
-        color: #111;
-        border-radius: 6px;
-        padding: 8px 18px;
-        font-weight: 600;
-        margin-top: 18px;
-    }
-
-        .btn-back:hover {
-            background: #f7ca00;
-        }
-
+    body { background: var(--bg-light); font-family: "Segoe UI", Roboto, Arial; color: var(--text-main); }
+    .orders-container { max-width: 1300px; margin: 0 auto; padding: 40px 15px; }
+    .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+    .dash-title { font-size: 1.75rem; font-weight: 700; display: flex; gap: 10px; }
+    .dashboard-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .table-wrapper { padding: 20px; }
+    .admin-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .admin-table thead { background: #fafafa; }
+    .admin-table th { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding: 14px 10px; }
+    .admin-table td { padding: 14px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.95rem; }
+    .admin-table tbody tr:hover { background: #fafafa; transition: 0.2s; }
+    .admin-table td:nth-child(1) { font-weight: 700; color: var(--primary-color); width: 90px; }
+    .admin-table td:nth-child(3) { font-weight: 700; color: #B12704; }
+    .admin-table td:nth-child(6) { text-align: right; width: 200px; }
+    .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+    .badge-cod { background: var(--warning-bg); color: var(--warning-text); }
+    .badge-online { background: var(--success-bg); color: var(--success-text); }
+    .badge-status { background: var(--info-bg); color: var(--info-text); }
+    .btn-view { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 5px; transition: 0.2s; }
+    .btn-view:hover { background: var(--primary-color); color: white; }
+    .btn-update { background: #ffd814; border: 1px solid #fcd200; padding: 5px 10px; font-size: 12px; border-radius: 6px; font-weight: 600; transition: 0.2s; }
+    .btn-update:hover { background: #f7ca00; }
+    .form-select-sm { font-size: 12px; padding: 4px 6px; border-radius: 6px; }
+    .btn-back { margin-top: 20px; display: inline-block; background: #eee; padding: 8px 16px; border-radius: 6px; text-decoration: none; color: #333; }
 </style>
 
-<div class="orders-container">
+@{
 
+    var selectedStatus = Context.Request.Query["statusFilter"].ToString();
+    var statuses = new[] { "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled" };
+}
+
+<div class="orders-container">
     <div class="dashboard-header">
-        <h1 class="dash-title"><i class="fas fa-clipboard-list text-primary"></i> Order Management</h1>
+        <h1 class="dash-title">
+            <i class="fas fa-clipboard-list"></i> Order Management
+        </h1>
+
+        <!-- Status Filter -->
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label for="statusFilter">Filter by Status:</label>
+            <select name="statusFilter" id="statusFilter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">All</option>
+
+                @foreach(var status in statuses)
+                {
+                    if (status == selectedStatus)
+                    {
+                        <option value="@status" selected>@status</option>
+                    }
+                    else
+                    {
+                        <option value="@status">@status</option>
+                    }
+                }
+            </select>
+        </form>
     </div>
 
     <div class="dashboard-card">
@@ -227,20 +91,17 @@
                     <tr>
                         <th>Order ID</th>
                         <th>User Name</th>
-                        <th>Total Amount</th>
-                        <th>Payment Method</th>
+                        <th>Total</th>
+                        <th>Payment</th>
                         <th>Status</th>
-                        <th style="width:150px;" class="text-end">Action</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-5">
-                                <i class="fas fa-box-open fa-2x mb-2" style="opacity: 0.5;"></i>
-                                <p class="mb-0">No orders have been placed yet.</p>
-                            </td>
+                            <td colspan="6" class="text-center py-4">No Orders Found</td>
                         </tr>
                     }
                     else
@@ -248,31 +109,44 @@
                         @foreach (var order in Model)
                         {
                             <tr>
-                                <td class="order-id">#@order.Id</td>
-                                <td class="fw-semibold">@order.Name</td>
-                                <td class="fw-bold" style="color: #B12704;">₹@order.TotalAmount</td>
+                                <td>#@order.Id</td>
+                                <td>@order.Name</td>
+                                <td>₹@order.TotalAmount</td>
+
                                 <td>
                                     @if (order.PaymentMethod == "COD")
                                     {
-                                        <span class="status-badge badge-cod"><i class="fas fa-hand-holding-usd"></i> COD</span>
+                                        <span class="status-badge badge-cod">COD</span>
                                     }
-                                    else if (order.PaymentMethod == "Online")
+                                    else
                                     {
-                                        <div>
-                                            <span class="status-badge badge-online mb-1"><i class="fas fa-credit-card"></i> Online</span>
-                                            <div class="small text-muted" style="font-size: 0.75rem;">@order.PaymentId</div>
-                                        </div>
+                                        <span class="status-badge badge-online">Online</span>
                                     }
                                 </td>
+
                                 <td>
-                                    <span class="status-badge badge-status">
-                                        <i class="fas fa-info-circle"></i> @order.Status
-                                    </span>
+                                    <span class="status-badge badge-status">@order.Status</span>
                                 </td>
-                                <td class="text-end">
-                                    <button class="btn-view" onclick="showOrderDetails(@order.Id)">
-                                        <i class="fas fa-file-invoice"></i> View Details
-                                    </button>
+
+                                <td>
+                                    <form asp-action="UpdateOrderStatus" method="post">
+                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            @foreach(var status in statuses)
+                                            {
+                                                if (status == order.Status)
+                                                {
+                                                    <option value="@status" selected>@status</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@status">@status</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+
+                                    <a asp-action="OrderDetails" asp-route-orderId="@order.Id" class="btn-view">View</a>
                                 </td>
                             </tr>
                         }
@@ -283,92 +157,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" style="border: none; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <div class="modal-header border-bottom-0 pb-0">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body pt-0 px-4 pb-4" id="orderDetailsContent">
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
-                    <p>Loading invoice details...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <button type="button" class="btn-back" onclick="history.back();">
-        ← Go Back
-    </button>
-    <script>
-function showOrderDetails(orderId) {
-
-    var modal = new bootstrap.Modal(document.getElementById('orderModal'));
-    modal.show();
-
-    document.getElementById("orderDetailsContent").innerHTML =
-        `<div class="text-center py-5 text-muted">
-            <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
-            <p>Loading invoice details...</p>
-        </div>`;
-
-    fetch('/Admin/GetOrderDetails?orderId=' + orderId)
-        .then(response => response.json())
-        .then(data => {
-
-            let html = `
-            <div class="invoice-card">
-                <div class="invoice-header">
-                    <div>
-                        <div class="invoice-title">Order #${orderId}</div>
-                    </div>
-                </div>
-
-                <table class="table invoice-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-            let total = 0;
-
-            data.forEach(item => {
-                let rowTotal = item.price * item.quantity;
-                total += rowTotal;
-
-                html += `
-                <tr>
-                    <td>${item.productName}</td>
-                    <td>₹${item.price}</td>
-                    <td>${item.quantity}</td>
-                    <td>₹${rowTotal}</td>
-                </tr>`;
-            });
-
-            html += `
-                    <tr class="invoice-summary-row">
-                        <td colspan="3">Total</td>
-                        <td>₹${total}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>`;
-
-            document.getElementById("orderDetailsContent").innerHTML = html;
-        })
-        .catch(error => {
-            document.getElementById("orderDetailsContent").innerHTML =
-                `<div class="text-danger text-center p-4">
-                    Failed to load order details.
-                </div>`;
-        });
-}
-</script>
+<a asp-controller="Admin" asp-action="Dashboard" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Back to Dashboard
+</a>

@@ -1,0 +1,20 @@
+﻿@model EC.Models.Review
+
+<form asp-action="AddReview" method="post">
+    <input type="hidden" asp-for="ProductId" />
+    <div>
+        <label>Rating:</label>
+        <select asp-for="Rating">
+            <option value="1">1 ⭐</option>
+            <option value="2">2 ⭐⭐</option>
+            <option value="3">3 ⭐⭐⭐</option>
+            <option value="4">4 ⭐⭐⭐⭐</option>
+            <option value="5">5 ⭐⭐⭐⭐⭐</option>
+        </select>
+    </div>
+    <div>
+        <label>Comment:</label>
+        <textarea asp-for="Comment"></textarea>
+    </div>
+    <button type="submit">Submit Review</button>
+</form>

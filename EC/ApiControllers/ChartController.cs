@@ -42,19 +42,26 @@
             SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL
             SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
         ),
-        SalesData AS (
-            SELECT 
-                MONTH(o.OrderDate) AS OrderMonth,
-                SUM(oi.Quantity * oi.Price) AS Revenue,
-                COUNT(DISTINCT o.ID) AS OrdersCount
-            FROM Orders o
-            INNER JOIN OrderItems oi ON o.Id = oi.OrderId
-            INNER JOIN Products p ON p.Id = oi.ProductId
-            WHERE 
-                CAST(o.OrderDate AS DATE) BETWEEN @FromDate AND @ToDate
-                AND (ISNULL(@SellerId, 0) = 0 OR p.SellerId = @SellerId)
-            GROUP BY MONTH(o.OrderDate)
+     SalesData AS (
+    SELECT 
+        MONTH(o.OrderDate) AS OrderMonth,
+        SUM(o.TotalAmount) AS Revenue,
+        COUNT(o.Id) AS OrdersCount
+    FROM Orders o
+    WHERE 
+        o.OrderDate >= @FromDate 
+        AND o.OrderDate <= @ToDate
+        AND (
+            @SellerId = 0   -- ✅ Admin case (show all)
+            OR o.Id IN (
+                SELECT oi.OrderId
+                FROM OrderItems oi
+                INNER JOIN Products p ON p.Id = oi.ProductId
+                WHERE p.SellerId = @SellerId
+            )
         )
+    GROUP BY MONTH(o.OrderDate)
+)
         SELECT 
             FORMAT(DATEFROMPARTS(YEAR(@FromDate), m.MonthNum, 1), 'MMM') AS Month,
             ISNULL(s.Revenue, 0) AS Revenue,

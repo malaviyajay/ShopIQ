@@ -104,17 +104,10 @@ namespace EC.Controllers
         }
 
         // ================= ORDER DETAILS =================
-        [HttpGet]
-        public IActionResult GetOrderDetails(int orderId)
+        public IActionResult OrderDetails(int orderId)
         {
-            var order = _db.GetOrderById(orderId);
-
-            if (order == null)
-                return NotFound();
-
-            var result = _db.GetOrderItems(orderId, userId: null);
-
-            return Json(result);
+            var items = _db.GetOrderItems(orderId); // same method you used before
+            return View(items);
         }
 
         // ================= SEARCH =================
@@ -210,5 +203,37 @@ namespace EC.Controllers
             TempData["Success"] = "Role updated successfully!";
             return RedirectToAction("UserList");
         }
+        //========= update order status ============
+        [HttpPost]
+        [HttpPost]
+        public IActionResult UpdateOrderStatus(int orderId, string status)
+        {
+            _db.UpdateOrderStatus(orderId, status);
+            return RedirectToAction("Orders"); // admin page
+        }
+
+        // ====== List Pending Reviews ======
+        public IActionResult PendingReviews()
+        {
+            var reviews = _db.GetAllReviews()
+                             .Where(r => r.Status == "Pending")
+                             .ToList();
+
+            return View(reviews);
+        }
+
+        // ====== Approve or Reject Review ======
+        [HttpPost]
+        public IActionResult UpdateReviewStatus(int id, string status)
+        {
+            if (status != "Approved" && status != "Rejected")
+                return BadRequest();
+
+            _db.UpdateReviewStatus(id, status);
+
+            TempData["Message"] = $"Review has been {status.ToLower()}!";
+            return RedirectToAction("PendingReviews");
+        }
+
     }
 }

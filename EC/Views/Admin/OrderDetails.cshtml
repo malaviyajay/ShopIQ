@@ -173,7 +173,6 @@
         <div class="order-title">
             <i class="bi bi-box-seam"></i> Order Details
         </div>
-
         @{
             var order = Model.FirstOrDefault();
         }
@@ -302,30 +301,29 @@
             <i class="bi bi-house"></i> Delivered
         </div>
     }
-
-
+</div>
 
 
 @{
-        var role = User.FindFirst(ClaimTypes.Role)?.Value;
-    }
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+}
 
-    @if (role == "Admin")
-    {
-        <a asp-controller="Admin" asp-action="Orders" class="btn-back">
-            ← Back to Orders
-        </a>
-    }
-    else if (role == "Seller")
-    {
-        <a asp-controller="Seller" asp-action="Orders" class="btn-back">
-            ← Back to Orders
-        </a>
-    }
-    else
-    {
-        <a asp-controller="Home" asp-action="Index" class="btn-back">
-            ← Back to Home
-        </a>
-    }
+@if (role == "Admin")
+{
+    <a asp-controller="Admin" asp-action="Orders" class="btn-back">
+        ← Back to Orders
+    </a>
+}
+else if (role == "Seller")
+{
+    <a asp-controller="Seller" asp-action="Orders" class="btn-back">
+        ← Back to Orders
+    </a>
+}
+else
+{
+    <a asp-controller="Home" asp-action="Index" class="btn-back">
+        ← Back to Home
+    </a>
+}
 </div>

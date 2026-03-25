@@ -11,6 +11,7 @@ namespace EC.Models
         public int CategoryId { get; set; }
         public int Quantity { get; set; }
         public string? Category { get; set; }
+    
     }
 
     public class DashboardViewModel
@@ -25,8 +26,9 @@ namespace EC.Models
         public decimal OrderGrowth { get; set; }
         public decimal UserGrowth { get; set; }
         public decimal ProductGrowth { get; set; }
+        public int PendingReviewCount { get; set; }
 
-   
+
         public List<decimal> MonthlyRevenue { get; set; } = new();
         public List<decimal> MonthlyProfit { get; set; } = new();
         public List<int> MonthlyOrders { get; set; } = new();

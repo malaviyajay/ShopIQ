@@ -68,7 +68,7 @@ namespace EC.Controllers
                 {
                     UserId = order.UserId,
                     UserName = order.Name,
-                    TotalAmount = order.TotalAmount,
+                    TotalAmount = order.TotalAmount,    
                     PaymentMethod = order.PaymentMethod,
                     Items = order.Items
                 });

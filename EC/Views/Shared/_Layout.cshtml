@@ -1,4 +1,4 @@
-﻿@using System.Security.Claims
+﻿﻿@using System.Security.Claims
 @inject IHttpContextAccessor HttpContextAccessor;
 @inject EC.Data.DbHelper _db;
 
@@ -42,7 +42,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
+        
     <style>
             :root {
                 --primary: #6366f1;
@@ -56,7 +56,7 @@
 
             body {
                 background-color: var(--bg-body);
-                background-image: radial-gradient(circle at top right,#e0e7ff 0%,transparent 20%),radial-gradient(circle at bottom left,#f1f5f9 0%,transparent 20%);
+                background-image: radial-gradient(circle at top right,#e0e7ff 0%,transparent 20%), radial-gradient(circle at bottom left,#f1f5f9 0%,transparent 20%);
                 font-family: 'Plus Jakarta Sans',sans-serif;
                 color: var(--dark);
                 display: flex;
@@ -185,27 +185,30 @@
                 padding-bottom: 4rem;
             }
 
+            /* -------- Compact Footer Styles -------- */
             .social-footer {
                 background: var(--dark);
                 color: #fff;
-                padding: 4rem 0 2rem 0;
+                padding: 1rem 0 0.5rem 0; /* very small padding */
                 border-top-left-radius: 40px;
                 border-top-right-radius: 40px;
                 font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 0.85rem; /* smaller text */
+                text-align: center;
             }
 
             .social-btn {
-                width: 45px;
-                height: 45px;
-                border-radius: 12px;
+                width: 35px; /* smaller buttons */
+                height: 35px;
+                border-radius: 8px;
                 background: rgba(255, 255, 255, 0.05);
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 8px;
+                margin: 0 4px; /* tighter spacing */
                 color: #fff;
                 text-decoration: none;
-                font-size: 1.2rem;
+                font-size: 1rem;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 transition: all 0.3s ease;
             }
@@ -213,139 +216,28 @@
                 .social-btn:hover {
                     background: var(--primary);
                     color: #fff;
-                    transform: translateY(-5px);
+                    transform: translateY(-2px);
                     border-color: var(--primary);
                 }
 
             .footer-divider {
                 height: 1px;
                 background: rgba(255, 255, 255, 0.1);
-                margin: 2rem 0;
+                margin: 0.5rem 0; /* very small spacing */
             }
 
-            /* ---------------- Chat Box Styles ---------------- */
-            #chatToggleBtn {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 9999;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: var(--primary);
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.4rem;
+            .account-toggle img {
+                transition: 0.2s;
             }
 
-            #chatContainer {
-                position: fixed;
-                bottom: 90px;
-                right: 20px;
-                width: 350px;
-                max-height: 450px;
-                background: #fff;
-                border-radius: 12px;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-                display: none;
-                flex-direction: column;
-                overflow: hidden;
-                z-index: 9998;
+            .account-toggle:hover img {
+                opacity: 0.8;
             }
-
-            #chatHeader {
-                background: var(--primary);
-                color: #fff;
-                padding: 12px 15px;
-                font-weight: 600;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                cursor: pointer;
-            }
-
-            #chatMessages {
-                flex: 1;
-                padding: 10px 15px;
-                overflow-y: auto;
-                background: #f5f5f5;
-            }
-
-            .chat-message {
-                margin-bottom: 10px;
-                display: flex;
-                flex-direction: column;
-            }
-
-                .chat-message.admin {
-                    align-items: flex-start;
-                }
-
-                .chat-message.user {
-                    align-items: flex-end;
-                }
-
-                .chat-message .msg-content {
-                    padding: 8px 12px;
-                    border-radius: 12px;
-                    max-width: 75%;
-                    word-wrap: break-word;
-                }
-
-                .chat-message.admin .msg-content {
-                    background: #e0e0e0;
-                    color: #000;
-                }
-
-                .chat-message.user .msg-content {
-                    background: var(--primary);
-                    color: #fff;
-                }
-
-                .chat-message .msg-time {
-                    font-size: 0.7rem;
-                    color: #666;
-                    margin-top: 2px;
-                }
-
-            #chatInputContainer {
-                display: flex;
-                border-top: 1px solid #ddd;
-            }
-
-            #chatInput {
-                flex: 1;
-                border: none;
-                padding: 10px 12px;
-                font-size: 0.9rem;
-                outline: none;
-            }
-
-            #chatSendBtn {
-                background: var(--primary);
-                color: #fff;
-                border: none;
-                padding: 0 16px;
-                cursor: pointer;
-            }
-
-            @@media (max-width: 576px) {
-                #chatContainer {
-                    width: 90%;
-                    right: 5%;
-                }
-            }
-            /* ---------------- End Chat Box Styles ---------------- */
     </style>
 </head>
 
 <body>
-    
+
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
 
@@ -406,33 +298,32 @@
                     }
 
                     <div class="dropdown">
+                                <a href="#"
+                                   class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
+                                   data-bs-toggle="dropdown">
+                                <!-- Account Icon -->
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
 
-                        <a href="#"
-                               class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
-                               data-bs-toggle="dropdown">
-
-                            <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
-                            <span class="d-none d-sm-inline">Account</span>
-
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <span class="d-none d-sm-inline">Account</span>
+                                </a>
+                           <ul class="dropdown-menu dropdown-menu-end shadow">
 
                             <li>
                                 <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
                                     <i class="bi bi-person me-2"></i> My Profile
                                 </a>
                             </li>
-
-                            @if (User.Identity.IsAuthenticated && User.IsInRole("Customer"))
-                            {
-                                <li>
+                            @if (User.Identity!.IsAuthenticated && User.IsInRole("Customer"))
+                    {
+                            <li>  
                                     <a class="dropdown-item" asp-controller="Order" asp-action="Index">
                                         <i class="bi bi-box-seam me-2"></i> My Orders
                                     </a>
-                                </li>
-                            }
-
+                            </li>
+                    }
                             <li><hr class="dropdown-divider"></li>
 
                             <li>
@@ -449,15 +340,19 @@
                     @if (UserRoles.Any() && UserRoles.Count > 1)
                     {
                         <div class="dropdown">
-
-                            <a href="#"
+                                <a href="#"
                                    class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
                                    data-bs-toggle="dropdown">
+                                  <!-- Switch Role/User Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat">
+                                    <polyline points="17 1 21 5 17 9"></polyline>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                    <polyline points="7 23 3 19 7 15"></polyline>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                                </svg>
 
-                                <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
-                                <span class="d-none d-sm-inline">Switch Role</span>
-
-                            </a>
+                                    <span class="d-none d-sm-inline">Switch Role</span>
+                                </a>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow">
 
@@ -496,7 +391,6 @@
     <main class="container mt-4 pt-2">
         @RenderBody()
     </main>
-
     <footer class="footer bg-dark text-light pt-5">
         <div class="container">
             <div class="row">
@@ -522,92 +416,31 @@
         </div>
     </footer>
 
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        // Cart count
-        function loadCartCount() {
-        const cart = document.getElementById("cartCount");
-        if (!cart) return;
+
+        function loadCartCount(){
+
+        const cart=document.getElementById("cartCount");
+        if(!cart)return;
+
         fetch('/Cart/CartCount')
-        .then(response => response.text())
-        .then(data => { cart.innerText = data; });
+        .then(response=>response.text())
+        .then(data=>{
+        cart.innerText=data;
+        });
+
         }
+
         loadCartCount();
+
     </script>
-
-    <!-- ================= Right-side Chat Box ================= -->
-    <!-- Chat toggle button -->
-    <button id="chatToggleBtn"><i class="bi bi-chat-dots"></i></button>
-
-    <!-- Chat container -->
-    <div id="chatContainer">
-        <div id="chatHeader">
-            Chat Support
-            <span id="chatCloseBtn" style="cursor:pointer;">&times;</span>
-        </div>
-        <div id="chatMessages"></div>
-        <div id="chatInputContainer">
-            <input type="text" id="chatInput" placeholder="Type a message..." />
-            <button id="chatSendBtn"><i class="bi bi-send-fill"></i></button>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
-    <script>
-        const chatToggleBtn = document.getElementById('chatToggleBtn');
-        const chatContainer = document.getElementById('chatContainer');
-        const chatCloseBtn = document.getElementById('chatCloseBtn');
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const chatSendBtn = document.getElementById('chatSendBtn');
-
-        // Toggle chat window
-        chatToggleBtn.addEventListener('click', () => {
-        chatContainer.style.display = chatContainer.style.display === 'flex' ? 'none' : 'flex';
-        chatContainer.style.flexDirection = 'column';
-        });
-
-        chatCloseBtn.addEventListener('click', () => chatContainer.style.display = 'none');
-
-        // SignalR setup
-        const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
-
-        connection.on("ReceiveMessage", (user, message, time) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `chat-message ${user === 'Admin' ? 'admin' : 'user'}`;
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'msg-content';
-        contentDiv.textContent = message;
-
-        const timeDiv = document.createElement('div');
-        timeDiv.className = 'msg-time';
-        timeDiv.textContent = time || new Date().toLocaleTimeString();
-
-        msgDiv.appendChild(contentDiv);
-        msgDiv.appendChild(timeDiv);
-
-        chatMessages.appendChild(msgDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        });
-
-        connection.start().catch(err => console.error(err.toString()));
-
-        chatSendBtn.addEventListener('click', () => {
-        const msg = chatInput.value.trim();
-        if (!msg) return;
-        connection.invoke("SendMessage", "Customer", msg, new Date().toLocaleTimeString());
-        chatInput.value = '';
-        });
-
-        chatInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') chatSendBtn.click();
-        });
-    </script>
-    <!-- ================= End Right-side Chat Box ================= -->
 
 </body>
 </html>

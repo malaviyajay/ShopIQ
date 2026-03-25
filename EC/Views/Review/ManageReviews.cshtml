@@ -1,0 +1,30 @@
+﻿@model List<EC.Models.Review>
+
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>User</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var r in Model)
+        {
+            <tr>
+                <td>@r.Product.Name</td>
+                <td>@r.User.Name</td>
+                <td>@r.Rating ⭐</td>
+                <td>@r.Comment</td>
+                <td>@r.Status</td>
+                <td>
+                    <a href="@Url.Action("UpdateStatus", "Review", new { id=r.Id, status="Approved" })">Approve</a> |
+                    <a href="@Url.Action("UpdateStatus", "Review", new { id=r.Id, status="Rejected" })">Reject</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>    

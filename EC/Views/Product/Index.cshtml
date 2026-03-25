@@ -276,7 +276,29 @@
                                 </a>
 
                                 <div class="rating">
-                                    ★★★★☆
+                                    @* Dynamic stars *@
+                                    @{
+                                        var ratingInfo = ViewBag.ProductRatings[p.Id];
+                                        int fullStars = (int)ratingInfo.Avg;
+                                        bool halfStar = (ratingInfo.Avg - fullStars) >= 0.5;
+                                    }
+
+                                    @for (int i = 0; i < fullStars; i++)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+
+                                    @if (halfStar)
+                                    {
+                                        <i class="fas fa-star-half-alt"></i>
+                                    }
+
+                                    @for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++)
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+
+                                    <span class="text-muted small">(@ratingInfo.Total)</span>
                                 </div>
 
                                 <div class="card-footer-custom">

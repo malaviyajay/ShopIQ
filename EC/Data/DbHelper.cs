@@ -826,7 +826,7 @@ VALUES
 
             Console.WriteLine("Changes saved successfully.");
         }
-       
+
         // ================= ORDER DETAILS (FINAL FIX) =================
         public List<OrderDetailViewModel> GetOrderItems(int orderId, int? userId = null)
         {
@@ -836,16 +836,19 @@ VALUES
             con.Open();
 
             string sql = @"
-                 SELECT 
-                     OD.ProductId,
-                     OD.ProductName,
-                     OD.Quantity,
-                     OD.Price,
-                     U.Name AS UserName
-                      FROM OrderItems OD
-                      INNER JOIN Orders O ON O.Id = OD.OrderId
-                      INNER JOIN Users U ON U.Id = O.UserId
-                      WHERE OD.OrderId = @orderId";
+SELECT 
+    OD.ProductId,
+    OD.ProductName,
+    OD.Quantity,
+    OD.Price,
+    U.Name AS UserName,
+    U.Phone,
+    U.Address,
+    O.Status   -- ✅ ADD THIS
+FROM OrderItems OD
+INNER JOIN Orders O ON O.Id = OD.OrderId
+INNER JOIN Users U ON U.Id = O.UserId
+WHERE OD.OrderId = @orderId";
 
             if (userId.HasValue)
                 sql += " AND O.UserId = @userId";
@@ -863,13 +866,18 @@ VALUES
             {
                 items.Add(new OrderDetailViewModel
                 {
+                    UserName = Convert.ToString(reader["UserName"]) ?? "",
+                    Phone = Convert.ToString(reader["Phone"]) ?? "",
+                    Address = Convert.ToString(reader["Address"]) ?? "",
                     ProductId = Convert.ToInt32(reader["ProductId"]),
                     ProductName = Convert.ToString(reader["ProductName"]) ?? "",
                     Quantity = Convert.ToInt32(reader["Quantity"]),
                     Price = Convert.ToDecimal(reader["Price"]),
-                    UserName = Convert.ToString(reader["UserName"]) ?? ""
+                    Status = Convert.ToString(reader["Status"]) ?? ""
+
                 });
             }
+        
 
             return items;
         }
@@ -1125,7 +1133,6 @@ VALUES
             var products = GetProductsBySeller(sellerId);
             var orders = GetOrdersBySeller(sellerId);
 
-            // ✅ FIX: remove duplicate orders
             var uniqueOrders = orders
                 .GroupBy(o => o.Id)
                 .Select(g => g.First())
@@ -1140,16 +1147,16 @@ VALUES
                 SellerName = $"Seller {sellerId}",
                 ProductCount = products.Count,
 
-                Order = uniqueOrders.Count,   // ✅ FIXED
-                Revenue = revenue,            // ✅ FIXED
-                Profit = profit,              // ✅ FIXED
+                Order = uniqueOrders.Count,   
+                Revenue = revenue,            
+                Profit = profit,             
 
                 LowStockCount = GetLowStockCountBySeller(sellerId),
                 Product = products,
-                Orders = uniqueOrders         // ✅ FIXED
+                Orders = uniqueOrders        
             };
 
-            // Top Products
+            //=============== Top Products===============
             model.TopProducts = orders
                 .GroupBy(o => o.ProductName)
                 .Select(g => new TopProduct
@@ -1161,7 +1168,7 @@ VALUES
                 .Take(5)
                 .ToList();
 
-            // Recent Orders
+            // ==========Recent Orders=====================
             model.Recentorders = uniqueOrders
                 .OrderByDescending(o => o.OrderDate)
                 .Take(5)
@@ -1244,7 +1251,7 @@ VALUES
 
                     while (reader.Read())
                     {
-                        orders.Add(new Order
+                      orders.Add(new Order
                         {
                             Id = Convert.ToInt32(reader["Id"]),
                             OrderDate = Convert.ToDateTime(reader["OrderDate"]),
@@ -1259,7 +1266,95 @@ VALUES
 
                 return orders;
             }
-      
+        public void UpdateOrderStatus(int orderId, string status)
+        {
+            using var con = GetConnection();
+            con.Open();
+
+            var cmd = new SqlCommand(
+                "UPDATE Orders SET Status = @status WHERE Id = @id", con);
+
+            cmd.Parameters.AddWithValue("@status", status);
+            cmd.Parameters.AddWithValue("@id", orderId);
+
+            cmd.ExecuteNonQuery();
+        }
+        //================== product reviw ================
+        public void AddReview(Review review)
+        {
+            using var con = GetConnection();
+            con.Open();
+            var cmd = new SqlCommand("INSERT INTO Reviews (ProductId, UserId, Rating, Comment, Status) VALUES (@pid, @uid, @rating, @comment, @status)", con);
+            cmd.Parameters.AddWithValue("@pid", review.ProductId);
+            cmd.Parameters.AddWithValue("@uid", review.UserId);
+            cmd.Parameters.AddWithValue("@rating", review.Rating);
+            cmd.Parameters.AddWithValue("@comment", review.Comment);
+            cmd.Parameters.AddWithValue("@status", review.Status);
+            cmd.ExecuteNonQuery();
+        }
+
+        public List<Review> GetAllReviews()
+        {
+            using var con = GetConnection();
+            var reviews = new List<Review>();
+            con.Open();
+
+            var cmd = new SqlCommand(@"
+        SELECT r.Id, r.ProductId, r.UserId, r.Rating, r.Comment, r.CreatedAt,
+               u.Id AS UserId, u.Name AS UserName
+        FROM Reviews r
+        LEFT JOIN Users u ON r.UserId = u.Id
+        ORDER BY r.CreatedAt DESC
+    ", con);
+
+            using var rd = cmd.ExecuteReader();
+            while (rd.Read())
+            {
+                int? userId = rd.IsDBNull(rd.GetOrdinal("UserId")) ? null : rd.GetInt32(rd.GetOrdinal("UserId"));
+                string userName = rd.IsDBNull(rd.GetOrdinal("UserName")) ? "Unknown" : rd.GetString(rd.GetOrdinal("UserName"));
+
+                reviews.Add(new Review
+                {
+                    Id = rd.GetInt32(rd.GetOrdinal("Id")),
+                    ProductId = rd.GetInt32(rd.GetOrdinal("ProductId")),
+                    UserId = rd.IsDBNull(rd.GetOrdinal("UserId")) ? 0 : rd.GetInt32(rd.GetOrdinal("UserId")), // or nullable int
+                    Rating = rd.GetInt32(rd.GetOrdinal("Rating")),
+                    Comment = rd.IsDBNull(rd.GetOrdinal("Comment")) ? "" : rd.GetString(rd.GetOrdinal("Comment")),
+                    CreatedAt = rd.GetDateTime(rd.GetOrdinal("CreatedAt")),
+                    User = userId.HasValue ? new User { Id = userId.Value, Name = userName } : null
+                });
+            }
+
+            return reviews;
+        }
+
+        public void UpdateReviewStatus(int id, string status)
+        {
+            using var con = GetConnection();
+            con.Open();
+            var cmd = new SqlCommand("UPDATE Reviews SET Status=@status WHERE Id=@id", con);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@status", status);
+            cmd.ExecuteNonQuery();
+        }
+        public User GetUser(int id)
+        {
+            using var con = GetConnection();
+            con.Open();
+            var cmd = new SqlCommand("SELECT * FROM Users WHERE Id=@id", con);
+            cmd.Parameters.AddWithValue("@id", id);
+            using var rd = cmd.ExecuteReader();
+            if (rd.Read())
+            {
+                return new User
+                {
+                    Id = (int)rd["Id"],
+                    Name = rd["Name"].ToString()
+                    // add other fields if needed
+                };
+            }
+            return null;
+        }
 
     }
     }
