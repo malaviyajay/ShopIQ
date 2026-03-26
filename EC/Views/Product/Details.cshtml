@@ -1,159 +1,367 @@
-﻿@model EC.Models.Product
-@using EC.Data
-@inject DbHelper _db
+﻿  @model EC.Models.Product
+        @using EC.Data
+        @inject DbHelper _db
 
-@{
-    ViewBag.Title = Model.Name;
-    double avg = ViewBag.AvgRating ?? 0;
-    int total = ViewBag.TotalRatings ?? 0;
-    var discount = 15;
-    var oldPrice = Model.Price + (Model.Price * discount / 100);
+        @{
+            ViewBag.Title = Model.Name;
+            double avg = ViewBag.AvgRating ?? 0;
+            int total = ViewBag.TotalRatings ?? 0;
+            var discount = 15;
+            var oldPrice = Model.Price + (Model.Price * discount / 100);
+            int reviewPageSize = 5; 
+            var reviews = ((IEnumerable<EC.Models.Review>)ViewBag.Reviews).Take(reviewPageSize).ToList();
+            int totalReviews = ((IEnumerable<EC.Models.Review>)ViewBag.Reviews).Count();
+        }
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+        <style>
+            :root {
+                --primary-color: #007185;
+                --secondary-color: #f08804;
+                --text-dark: #111;
+                --text-muted: #565959;
+                --bg-light: #f8f9fa;
+            }
+
+            body { 
+                font-family: 'Inter', sans-serif; 
+                background-color: var(--bg-light); 
+                color: var(--text-dark); 
+            }
+
+            /* Layout & Gallery */
+            .product-card-container { background: #fff; border-radius: 16px; border: 1px solid #e7e7e7; padding: 2rem; }
+            .main-img-container { background: #fff; border-radius: 12px; padding: 10px; text-align: center; height: 400px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+            .main-img-container img { max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease; }
+            .thumbnail-track { display: flex; gap: 10px; justify-content: center; }
+            .thumb { width: 60px; height: 60px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; object-fit: cover; transition: 0.2s; }
+            .thumb.active { border-color: var(--primary-color); }
+
+            /* Product Info */
+            .rating-badge { background: #388e3c; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+            .price-tag { font-size: 2.2rem; font-weight: 700; color: var(--text-dark); }
+            .price-old { text-decoration: line-through; color: var(--text-muted); font-size: 1.1rem; }
+            .discount-pill { background: #CC0C39; color: #fff; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.9rem; }
+
+            /* Buy Box */
+            .buy-box { border: 1px solid #ddd; border-radius: 12px; padding: 1.5rem; background: #fff; position: sticky; top: 20px; }
+            .btn-buy { background: var(--secondary-color); border: none; font-weight: 600; padding: 12px; color: #fff; border-radius: 8px; }
+            .btn-buy:hover { background: #d67903; color: #fff; }
+
+            /* Review Section */
+            .rating-summary-card { background: #fff; border-radius: 12px; padding: 1.5rem; border: 1px solid #eee; }
+            .progress { height: 10px; border-radius: 10px; background: #eee; }
+            .progress-bar { background-color: var(--secondary-color); }
+    
+            .review-card { border-bottom: 1px solid #eee; padding: 1.5rem 0; }
+            .avatar-circle { width: 45px; height: 45px; background: #e9ecef; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #6c757d; }
+    
+            .rating-stars i { cursor: pointer; transition: 0.2s; color: #ddd; font-size: 1.8rem; margin-right: 5px; }
+            .rating-stars i.selected, .rating-stars i.hovered { color: var(--secondary-color); }
+    
+            .comment-area { border-radius: 10px; border: 1px solid #ccc; padding: 10px; width: 100%; transition: 0.3s; }
+            .comment-area:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0,113,133,0.1); }
+
+            .btn-buy {
+    background: var(--secondary-color);
+    border: none;
+    font-weight: 600;
+    padding: 12px;
+    color: #fff;
+    border-radius: 8px;
+}
+            .back-btn {
+    border: 1px solid #d5d9d9;
+    background: #fff;
+    color: #0f1111;
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+.back-btn:hover {
+    background: #f7fafa;
+    border-color: #c7c7c7;
+    color: #0f1111;
+    text-decoration: none;
+}
 
-<style>
-    .product-wrapper { display: flex; gap: 30px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
-    .product-image { width: 100%; object-fit: contain; max-height: 450px; }
-    .product-title { font-size: 1.8rem; font-weight: 600; margin-bottom: 10px; }
-    .rating-stars, .avg-stars { display: flex; gap: 5px; font-size: 1.4rem; cursor: pointer; }
-    .rating-stars i, .avg-stars i { color: #ccc; transition: color 0.2s; }
-    .rating-stars i.selected, .rating-stars i.hovered, .avg-stars i.active { color: #f08804; }
-    .comment-box { margin-top: 15px; display: none; }
-    .comment-box textarea { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; resize: none; }
-    .btn-submit { margin-top: 10px; padding: 10px 20px; border-radius: 6px; background-color: #007185; color: #fff; border: none; cursor: pointer; }
-    .review-list { margin-top: 30px; }
-    .review-item { border-top: 1px solid #e7e7e7; padding: 10px 0; }
-    .review-item:first-child { border-top: none; }
-    .review-item .stars { color: #f08804; font-size: 1rem; }
-    .price-current { font-size: 1.8rem; font-weight: 700; margin-bottom: 5px; }
-    .price-old { color: #565959; text-decoration: line-through; margin-bottom: 10px; display: block; }
-</style>
+.back-btn:active {
+    background: #eef2f2;
+}
+        </style>
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        <div class="col-lg-5">
-            <img src="@(string.IsNullOrEmpty(Model.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + Model.Image))" 
-                 class="product-image" alt="@Model.Name" 
-                 onerror="this.src='@Url.Content("~/images/green.jfif")'" />
-        </div>
+        <div class="container my-5">
+            <div class="product-card-container">
+                <div class="row g-5">
+                    <div class="col-lg-5">
+                        <div class="main-img-container mb-3">
+                            <img id="mainImage" src="@(string.IsNullOrEmpty(Model.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + Model.Image))" onerror="this.src='@Url.Content("~/images/green.jfif")'" />
+                        </div>
+                        <div class="thumbnail-track">
+                            <img src="@(string.IsNullOrEmpty(Model.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + Model.Image))" class="thumb active" onclick="updateGallery(this)">
+                            </div>
+                    </div>
 
-        <div class="col-lg-4">
-            <h1 class="product-title">@Model.Name</h1>
+                    <div class="col-lg-4">
+                        <nav aria-label="breadcrumb" class="mb-2">
+                            <ol class="breadcrumb small">
+                                <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Electronics</a></li>
+                                <li class="breadcrumb-item active">@Model.Name</li>
+                            </ol>
+                        </nav>
 
-            <!-- Average Rating -->
-            <div class="avg-stars mb-2">
-                @{
-                    int fullStars = (int)avg;
-                    bool halfStar = (avg - fullStars) >= 0.5;
-                }
-                @for(int i=0;i<fullStars;i++){ <i class="fas fa-star active"></i> }
-                @if(halfStar){ <i class="fas fa-star-half-alt active"></i> }
-                @for(int i=fullStars+(halfStar?1:0);i<5;i++){ <i class="far fa-star"></i> }
-                <span class="text-muted small">(@total reviews)</span>
-            </div>
+                        <h1 class="h2 fw-bold mb-2">@Model.Name</h1>
+                
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="rating-badge">
+                                @avg.ToString("F1") <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-muted fw-medium small">@total Ratings & Reviews</span>
+                        </div>
 
-            <!-- User Rating -->
-            <h5>Rate this product:</h5>
-            <div class="rating-stars" id="userRatingStars">
-                @for(int i=1;i<=5;i++){
-                    <i class="far fa-star" data-value="@i"></i>
-                }
-            </div>
+                        <div class="mb-4">
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="discount-pill">-@discount%</span>
+                                <span class="price-tag">₹@Model.Price</span>
+                            </div>
+                            <div class="price-old">M.R.P: ₹@oldPrice</div>
+                            <p class="text-success fw-bold small mt-1">Inclusive of all taxes</p>
+                        </div>
 
-            <div class="comment-box" id="commentBox">
-                <form asp-action="SubmitRating" method="post">
-                    <input type="hidden" name="productId" value="@Model.Id" />
-                    <input type="hidden" name="rating" id="selectedRating" value="0" />
-                    <textarea name="comment" placeholder="Write your comment..." rows="3" required></textarea>
-                    <button type="submit" class="btn-submit">Submit Review</button>
-                </form>
-            </div>
+                        <div class="description-box mb-4">
+                            <h6 class="fw-bold">About this item</h6>
+                            <ul class="text-muted small ps-3">
+                                <li>High-quality materials designed for longevity.</li>
+                                <li>Ergonomic design with modern aesthetic.</li>
+                                <li>Industry-leading warranty and support.</li>
+                            </ul>
+                        </div>
+                    </div>
 
-            <!-- Price -->
-            <div class="mt-3">
-                <div class="price-current">₹@Model.Price</div>
-                <div class="price-old">M.R.P.: ₹@oldPrice</div>
-            </div>
-        </div>
-
-        <div class="col-lg-3">
-            <div class="buy-box">
-                @if(Model.Quantity>0){
-                    <label>Quantity:</label>
-                    <input type="number" value="1" min="1" max="@Model.Quantity" class="form-control mb-3" />
-                    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-warning w-100 mb-3">Add to Cart</a>
-                } else {
-                    <button class="btn btn-secondary w-100 mb-3" disabled>Out of Stock</button>
-                }
-                <button type="button" class="btn btn-outline-secondary w-100" onclick="history.back();">Back to Products</button>
-            </div>
-        </div>
-    </div>
-
-<!-- Reviews List -->
-<div class="review-list">
-    <h4>Customer Reviews</h4>
-    @if(ViewBag.Reviews != null && ((IEnumerable<EC.Models.Review>)ViewBag.Reviews).Any())
-    {
-        foreach(var r in (IEnumerable<EC.Models.Review>)ViewBag.Reviews)
-        {
-            <div class="review-item">
-                <div class="stars">
-                    @for(int i=0;i<r.Rating;i++){ <i class="fas fa-star"></i> }
-                    @for(int i=r.Rating;i<5;i++){ <i class="far fa-star"></i> }
+                    <div class="col-lg-3">
+                        <div class="buy-box">
+                            @if(Model.Quantity > 0) {
+                                <h5 class="text-success mb-3">In Stock</h5>
+                                <div class="mb-3">
+                                    <label class="small fw-bold">Quantity</label>
+                                    <select class="form-select mt-1">
+                                        @for(int i=1; i<=Math.Min(Model.Quantity, 10); i++) {
+                                            <option value="@i">@i</option>
+                                        }
+                                    </select>
+                                </div>
+                                <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-buy w-100 mb-2">
+                                    <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                </a>
+                                <button class="btn btn-outline-dark w-100 rounded-2 py-2 fw-bold small">Add to Wishlist</button>
+                            } else {
+                                <h5 class="text-danger mb-3">Out of Stock</h5>
+                                <p class="small text-muted">We don't know when or if this item will be back in stock.</p>
+                                <button class="btn btn-secondary w-100" disabled>Notify Me</button>
+                            }
+                        </div>
+                         <div class="col-lg-4">
+                        <a asp-controller="Product" asp-action="Index" class="back-btn mb-3 d-inline-block">
+                            ← Back to Products
+                        </a>
+                        </div>
+                    </div>
                 </div>
-                <p>@r.Comment</p>
-                <small class="text-muted">by @(r.User?.Name ?? "Anonymous")</small>
             </div>
-        }
-    }
-    else
+
+            <div class="row mt-5">
+                <div class="col-lg-4">
+                    <h4 class="fw-bold mb-4">Customer Reviews</h4>
+                    <div class="rating-summary-card shadow-sm">
+                        <div class="text-center mb-4">
+                            <h2 class="display-5 fw-bold mb-0">@avg.ToString("F1")</h2>
+                            <div class="text-warning mb-1">
+                                @for(int i=0; i<5; i++) { <i class="@(i < (int)avg ? "fas" : "far") fa-star"></i> }
+                            </div>
+                            @* <p class="text-muted small">@total global ratings</p> *@
+                        </div>
+                        @{
+    int[] starsArr = {5, 4, 3, 2, 1};
+    var counts = ViewBag.StarCounts as Dictionary<int,int> ?? new Dictionary<int,int>();
+}
+
+@for(int i = 0; i < 5; i++)
+{
+    int star = starsArr[i];
+    int count = counts.ContainsKey(star) ? counts[star] : 0;
+
+    int totalRatings = ViewBag.TotalRatings ?? 0;
+    int pct = totalRatings > 0 ? (int)((count * 100.0) / totalRatings) : 0;
+
+    <div class="d-flex align-items-center mb-2">
+        
+        <!-- ⭐ Label -->
+        <span class="small me-3 text-nowrap" style="width: 60px;">
+            @star star
+        </span>
+
+        <!-- 📊 Progress -->
+        <div class="progress flex-grow-1">
+            <div class="progress-bar" style="width:@pct%"></div>
+        </div>
+
+        <!-- 👥 Count -->
+        <span class="small ms-3 text-muted" style="width: 50px;">
+            @count
+        </span>
+    </div>
+}
+                        <hr class="my-4">
+                
+                        <h6 class="fw-bold">Review this product</h6>
+                        <p class="small text-muted">Share your thoughts with other customers</p>
+                        <div class="rating-stars mb-3" id="userRatingStars">
+                            @for(int i=1; i<=5; i++){ <i class="far fa-star" data-value="@i"></i> }
+                        </div>
+                
+                        <div id="commentBox" style="display:none;" class="mt-3">
+                            <form asp-action="SubmitRating" method="post">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <input type="hidden" name="rating" id="selectedRating" value="0" />
+                                <textarea name="comment" class="comment-area mb-2" rows="3" placeholder="Write your review here..." required></textarea>
+                                <button type="submit" class="btn btn-dark btn-sm w-100 rounded-pill">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 ps-lg-5">
+                    <h5 class="fw-bold mb-4">Top Reviews </h5>
+                    <div id="reviewContainer">
+
+    @foreach(var r in reviews)
     {
-        <p>No reviews yet.</p>
+        var Name = string.IsNullOrEmpty(r.Name) ? "Deleted User" : r.Name;
+
+        <div class="review-card">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="avatar-circle">@Name.Substring(0,1).ToUpper()</div>
+                <div>
+                    <h6 class="mb-0 fw-bold">@Name</h6>
+                    <div class="text-warning small">
+                        @for(int i=0; i<r.Rating; i++){ <i class="fas fa-star"></i> }
+                        @for(int i=r.Rating; i<5; i++){ <i class="far fa-star"></i> }
+                    </div>
+                </div>
+            </div>
+            <p class="text-muted small mb-2">Reviewed on @r.CreatedAt.ToString("dd MMM yyyy")</p>
+            <p class="review-text">@r.Comment</p>
+        </div>
     }
-</div></div>
+</div>
 
-<style>
-    .rating-stars i { color: #ccc; cursor: pointer; font-size: 1.5rem; transition: color 0.2s; }
-    .rating-stars i.hovered, .rating-stars i.selected { color: #f08804; }
-</style>
+    @if(totalReviews > reviewPageSize)
+    {
+        <button id="loadMoreReviews" class="btn btn-outline-secondary mt-4 px-4 rounded-pill">See more reviews</button>
+    }
+                </div>
+            </div>
+        </div>
+      <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const stars = document.querySelectorAll('#userRatingStars i');
-        const commentBox = document.getElementById('commentBox');
-        const selectedRatingInput = document.getElementById('selectedRating');
+    // ================= AMAZON STYLE STAR =================
+    const stars = document.querySelectorAll('#userRatingStars i');
+    const ratingInput = document.getElementById('selectedRating');
+    const commentBox = document.getElementById('commentBox');
 
-        function updateStars(upTo) {
-            stars.forEach((star, idx) => {
-                if (idx < upTo) star.classList.add('selected');
-                else star.classList.remove('selected');
-            });
-        }
+    let selected = 0;
 
-        stars.forEach(star => {
-            star.addEventListener('mouseover', () => {
-                const val = parseInt(star.dataset.value);
-                stars.forEach((s, idx) => {
-                    if(idx < val) s.classList.add('hovered');
-                    else s.classList.remove('hovered');
-                });
-            });
+    stars.forEach(star => {
 
-            star.addEventListener('mouseout', () => {
-                stars.forEach(s => s.classList.remove('hovered'));
-                updateStars(parseInt(selectedRatingInput.value));
-            });
+        // Hover effect
+        star.addEventListener('mouseenter', function () {
+            let val = parseInt(this.dataset.value);
 
-            star.addEventListener('click', () => {
-                const val = parseInt(star.dataset.value);
-                selectedRatingInput.value = val;
-                updateStars(val);
-                commentBox.style.display = 'block';
+            stars.forEach(s => {
+                s.classList.remove('hovered');
+                if (parseInt(s.dataset.value) <= val) {
+                    s.classList.add('hovered');
+                }
             });
         });
 
-        updateStars(parseInt(selectedRatingInput.value));
+        star.addEventListener('mouseleave', function () {
+            stars.forEach(s => s.classList.remove('hovered'));
+        });
+
+        // Click ⭐ (MAIN)
+        star.addEventListener('click', function () {
+            selected = parseInt(this.dataset.value);
+            ratingInput.value = selected;
+
+            stars.forEach(s => {
+                s.classList.remove('selected');
+                if (parseInt(s.dataset.value) <= selected) {
+                    s.classList.add('selected');
+                }
+            });
+
+            // Amazon behavior: show review box
+            commentBox.style.display = 'block';
+        });
     });
+
+    // ================= AMAZON LOAD MORE =================
+    let page = 1;
+    const pageSize = parseInt('@reviewPageSize');
+    const loadBtn = document.getElementById('loadMoreReviews');
+
+    if (loadBtn) {
+        loadBtn.addEventListener('click', function () {
+
+            page++;
+
+            fetch(`@Url.Action("LoadMoreReviews","Product")?productId=@Model.Id&page=${page}&pageSize=${pageSize}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    data.reviews.forEach(r => {
+
+                        let div = document.createElement('div');
+                        div.classList.add('review-card');
+
+                        let starsHtml = '';
+                        for (let i = 0; i < 5; i++) {
+                            starsHtml += i < r.Rating
+                                ? '<i class="fas fa-star"></i>'
+                                : '<i class="far fa-star"></i>';
+                        }
+
+                        div.innerHTML = `
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="avatar-circle">${r.Name.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">${r.Name}</h6>
+                                    <div class="text-warning small">
+                                        ${starsHtml}
+                                        <span class="ms-2 text-dark fw-bold">Verified Purchase</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-2">Reviewed on ${r.CreatedAt}</p>
+                            <p class="review-text">${r.Comment}</p>
+                        `;
+
+                        document.getElementById('reviewContainer').appendChild(div);
+                    });
+
+                    if (page * pageSize >= data.totalReviews) {
+                        loadBtn.style.display = 'none';
+                    }
+                });
+        });
+    }
+
+});
 </script>

@@ -10,78 +10,57 @@
 <style>
     :root {
         --primary-color: #007185;
-        --secondary-color: #f7ca00;
-        --secondary-hover: #e0b700;
-        --text-main: #0F1111;
-        --text-muted: #565959;
         --bg-light: #f3f3f3;
         --white: #ffffff;
         --border-color: #e7e7e7;
-        --success-bg: #d1e7dd;
-        --success-text: #0f5132;
-        --warning-bg: #fff3cd;
-        --warning-text: #856404;
-        --info-bg: #cff4fc;
-        --info-text: #055160;
+        --text-main: #0F1111;
+        --text-muted: #565959;
     }
 
     body {
         background: var(--bg-light);
-        font-family: "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-        color: var(--text-main);
+        font-family: "Segoe UI", Roboto, Arial;
     }
 
     .orders-container {
         max-width: 1300px;
-        margin: 0 auto;
+        margin: auto;
         padding: 40px 15px;
-    }
-
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-
-    .dash-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-main);
-        display: flex;
-        align-items: center;
-        gap: 10px;
     }
 
     .dashboard-card {
         background: var(--white);
         border-radius: 12px;
         border: 1px solid var(--border-color);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     }
 
     .table-wrapper {
-        padding: 20px 25px;
+        padding: 20px;
+    }
+
+    .dash-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .admin-table th {
         font-size: 0.85rem;
-        font-weight: 600;
         text-transform: uppercase;
         color: var(--text-muted);
         border-bottom: 2px solid var(--border-color);
-        padding: 15px 10px;
     }
 
     .admin-table td {
-        padding: 15px 10px;
+        padding: 14px 10px;
         border-bottom: 1px solid var(--border-color);
-        font-size: 0.95rem;
     }
 
-    .admin-table tr:hover td {
-        background-color: var(--bg-light);
+    .admin-table tbody tr:hover {
+        background: #fafafa;
     }
 
     .order-id {
@@ -89,46 +68,26 @@
         color: var(--primary-color);
     }
 
-    .status-badge {
-        padding: 5px 10px;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .badge-cod {
-        background: var(--warning-bg);
-        color: var(--warning-text);
-    }
-
-    .badge-online {
-        background: var(--success-bg);
-        color: var(--success-text);
-    }
-
-    .badge-status {
-        background: var(--info-bg);
-        color: var(--info-text);
-    }
-
     .btn-view {
-        background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
+        background: var(--primary-color);
+        color: white;
         padding: 6px 14px;
-        border-radius: 50px;
+        border-radius: 30px;
+        text-decoration: none;
         font-size: 0.85rem;
-        font-weight: 600;
-        transition: all .2s;
+        transition: 0.3s;
     }
 
-        .btn-view:hover {
-            background: var(--primary-color);
-            color: var(--white);
-        }
+    .btn-view:hover {
+        background: #005f73;
+    }
+
+    .filter-dropdown {
+        min-width: 180px;
+        border-radius: 8px;
+        padding: 6px;
+        border: 1px solid var(--border-color);
+    }
 
     .btn-back {
         margin-top: 20px;
@@ -139,17 +98,76 @@
         text-decoration: none;
         color: #333;
     }
+    /* PAYMENT */
+    .badge-cod {
+        background: #fff3cd;
+        color: #856404;
+    }
+    /* Yellow */
+    .badge-online {
+        background: #d4edda;
+        color: #155724;
+    }
+    /* Green */
+
+    /* STATUS COLORS */
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    /* Yellow */
+    .badge-confirmed {
+        background: #cce5ff;
+        color: #004085;
+    }
+    /* Blue */
+    .badge-shipped {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    /* Light Blue */
+    .badge-delivered {
+        background: #d4edda;
+        color: #155724;
+    }
+    /* Green */
+    .badge-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    /* Red */
+    .badge-notpaid {
+        background: #f5c6cb;
+        color: #721c24;
+    }
+    /* Dark Red */  
 </style>
 
 <div class="orders-container">
 
-    <div class="dashboard-header">
+    <!-- HEADER + FILTER -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
         <h1 class="dash-title">
             <i class="fas fa-shopping-bag text-primary"></i>
-            Seller Orders
+           Orders
         </h1>
+
+        
+        <form method="get" class="mb-3">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">All Orders</option>
+                <option value="Pending" selected="@(Context.Request.Query["status"] == "Pending")">Pending</option>
+                <option value="Processing" selected="@(Context.Request.Query["status"] == "Processing")">Processing</option>
+                <option value="Shipped" selected="@(Context.Request.Query["status"] == "Shipped")">Shipped</option>
+                <option value="Delivered" selected="@(Context.Request.Query["status"] == "Delivered")">Delivered</option>
+                <option value="Cancelled" selected="@(Context.Request.Query["status"] == "Cancelled")">Cancelled</option>
+                <option value="Not Paid" selected="@(Context.Request.Query["status"] == "Not Paid")">Not Paid</option>
+            </select>
+        </form>
     </div>
 
+    <!-- TABLE -->
     <div class="dashboard-card">
         <div class="table-wrapper table-responsive">
 
@@ -158,9 +176,9 @@
                 <thead>
                     <tr>
                         <th>Order ID</th>
-                        <th>C.Name</th>
+                        <th>Customer</th>
                         <th>Date</th>
-                        <th>Total Amount</th>
+                        <th>Total</th>
                         <th>Payment</th>
                         <th>Status</th>
                         <th class="text-end">Action</th>
@@ -177,55 +195,66 @@
 
                                 <td class="order-id">#@order.Id</td>
 
-                                <td class="fw-semibold">
-                                    @order.Name
-                                </td>
+                                <td>@order.Name</td>
 
-                                <td>
-                                    @order.OrderDate.ToString("dd MMM yyyy")
-                                </td>
+                                <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
 
                                 <td class="fw-bold text-danger">
                                     ₹@order.TotalAmount
                                 </td>
 
+                                <!-- PAYMENT -->
                                 <td>
-
                                     @if (order.PaymentMethod == "COD")
                                     {
                                         <span class="status-badge badge-cod">
-                                            <i class="fas fa-hand-holding-usd"></i> COD
+                                            <i class="fas fa-money-bill-wave"></i> COD
                                         </span>
                                     }
-
-                                    else if (order.PaymentMethod == "Online")
+                                    else
                                     {
                                         <span class="status-badge badge-online">
                                             <i class="fas fa-credit-card"></i> Online
                                         </span>
                                     }
-
                                 </td>
-
+                                <!-- STATUS -->
                                 <td>
-                                    <span class="status-badge badge-status">
-                                        @order.Status
-                                    </span>
+                                    @if (order.Status == "Pending")
+                                    {
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    }
+                                    else if (order.Status == "Processing")
+                                    {
+                                        <span class="badge bg-primary">Processing</span>
+                                    }
+                                    else if (order.Status == "Shipped")
+                                    {
+                                        <span class="badge bg-info text-dark">Shipped</span>
+                                    }
+                                    else if (order.Status == "Delivered")
+                                    {
+                                        <span class="badge bg-success">Delivered</span>
+                                    }
+                                    else if (order.Status == "Cancelled")
+                                    {
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    }
                                 </td>
 
+                                <!-- ACTION -->
                                 <td class="text-end">
-
-                                    <a asp-controller="Seller"asp-action="OrderDetails"asp-route-id="@order.Id"
-                                       class="btn-view text-decoration-none">
+                                    <a asp-controller="Seller"
+                                       asp-action="OrderDetails"
+                                       asp-route-id="@order.Id"
+                                       class="btn-view">
                                         View
                                     </a>
-
                                 </td>
 
                             </tr>
                         }
                     }
-
                     else
                     {
                         <tr>

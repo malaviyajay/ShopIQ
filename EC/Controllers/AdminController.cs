@@ -89,24 +89,31 @@ namespace EC.Controllers
             return RedirectToAction("Products");
         }
 
-        // ================= ORDERS =================
+        // ================= ORDERS  and Filter =================
+
         //public IActionResult Orders()
         //{
-        //    int sellerId = GetCurrentUserId();
-        //    var orders = _db.GetOrdersBySeller(sellerId);
+        //    var orders = _db.GetAllOrders();
         //    return View(orders);
         //}
-
-        public IActionResult Orders()
+        public IActionResult Orders(string status)
         {
             var orders = _db.GetAllOrders();
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                orders = orders.Where(o => o.Status == status).ToList();
+            }
+
+            ViewBag.SelectedStatus = status; 
+
             return View(orders);
         }
 
         // ================= ORDER DETAILS =================
         public IActionResult OrderDetails(int orderId)
         {
-            var items = _db.GetOrderItems(orderId); // same method you used before
+            var items = _db.GetOrderItems(orderId); 
             return View(items);
         }
 

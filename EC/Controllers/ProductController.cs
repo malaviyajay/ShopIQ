@@ -57,16 +57,37 @@ namespace EC.Controllers
 
             SetCartCount();
 
-            // Get all reviews for this product
-            var reviews = _db.GetAllReviews()?.Where(r => r.ProductId == id).ToList() ?? new List<Review>();
+            var reviews = _db.GetReviews(id) ?? new List<Review>();
 
+            // ✅ Fill Name (Amazon logic)
+            foreach (var r in reviews)
+            {
+                if (string.IsNullOrEmpty(r.Name))
+                {
+                    var user = _db.GetUser(r.UserId);
+                    r.Name = user != null ? user.Name : "Deleted User";
+                }
+            }
+
+            // ✅ AVG + TOTAL
             ViewBag.AvgRating = reviews.Any() ? reviews.Average(r => (double)r.Rating) : 0;
             ViewBag.TotalRatings = reviews.Count;
-            ViewBag.Reviews = reviews; // pass reviews directly
+
+            // ✅ AMAZON POLL (MAIN FIX)
+            Dictionary<int, int> starCounts = new Dictionary<int, int>();
+
+            for (int star = 1; star <= 5; star++)
+            {
+                int count = reviews.Count(r => r.Rating == star);
+                starCounts[star] = count; // ✅ store COUNT not %
+            }
+
+            ViewBag.StarCounts = starCounts;
+
+            ViewBag.Reviews = reviews;
 
             return View(product);
         }
-
         // =================== ADD PRODUCT (GET) ===================
         [Authorize(Roles = "Seller")]
         public IActionResult Add()
@@ -86,7 +107,7 @@ namespace EC.Controllers
                 return View(model);
             }
 
-            int sellerId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            int sellerId = Convert.ToInt32(/*User.FindFirst(ClaimTypes.NameIdentifier)?.Value*/User.FindFirst("UserId"));
             model.SellerId = sellerId;
 
             _db.AddProduct(model);
@@ -144,21 +165,57 @@ namespace EC.Controllers
         [Authorize(Roles = "Customer")]
         public IActionResult SubmitRating(int productId, int rating, string comment)
         {
-            int userId = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            int userId = Convert.ToInt32(User.FindFirst("UserId")?.Value);
 
+            var user = _db.GetUser(userId);
+
+            // ✅ AMAZON LOGIC: store name at time of review
             var review = new Review
             {
                 ProductId = productId,
                 UserId = userId,
+                Name = user != null ? user.Name : "Deleted User", // IMPORTANT
                 Rating = rating,
                 Comment = comment,
-                Status = "Approved" // Auto-approved
+                Status = "Approved",
+                CreatedAt = DateTime.Now
             };
 
             _db.AddReview(review);
 
-            TempData["Message"] = "Thank you! Your review has been submitted.";
             return RedirectToAction("Details", new { id = productId });
+        }
+        //==================================LoadMoreReviews=====================
+        [HttpGet]
+        public IActionResult LoadMoreReviews(int productId, int page = 1, int pageSize = 5)
+        {
+            var reviews = _db.GetReviews(productId)
+                   .OrderByDescending(r => r.CreatedAt)
+                   .Skip((page - 1) * pageSize)
+                   .Take(pageSize)
+                   .ToList();
+
+            // Fill Name from User table or fallback
+            var reviewsDto = reviews.Select(r => {
+                var user = _db.GetUser(r.UserId);
+                string name = user != null ? user.Name : "Deleted User";
+                return new
+                {
+                    Name = name,
+                    r.Rating,
+                    CreatedAt = r.CreatedAt.ToString("dd MMM yyyy"),
+                    r.Comment
+                };
+            }).ToList();
+
+            var allReviews = _db.GetReviews(productId).ToList();
+            int totalReviews = allReviews.Count;
+
+            return Json(new
+            {
+                reviews = reviewsDto,
+                totalReviews
+            });
         }
     }
 }

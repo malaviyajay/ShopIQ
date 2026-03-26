@@ -17,12 +17,6 @@
         --bg-light: #f3f3f3;
         --white: #ffffff;
         --border-color: #e7e7e7;
-        --success-bg: #d1e7dd;
-        --success-text: #0f5132;
-        --warning-bg: #fff3cd;
-        --warning-text: #856404;
-        --info-bg: #cff4fc;
-        --info-text: #055160;
     }
 
     body { background: var(--bg-light); font-family: "Segoe UI", Roboto, Arial; color: var(--text-main); }
@@ -33,27 +27,87 @@
     .table-wrapper { padding: 20px; }
     .admin-table { width: 100%; border-collapse: separate; border-spacing: 0; }
     .admin-table thead { background: #fafafa; }
-    .admin-table th { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding: 14px 10px; }
-    .admin-table td { padding: 14px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 0.95rem; }
-    .admin-table tbody tr:hover { background: #fafafa; transition: 0.2s; }
-    .admin-table td:nth-child(1) { font-weight: 700; color: var(--primary-color); width: 90px; }
-    .admin-table td:nth-child(3) { font-weight: 700; color: #B12704; }
-    .admin-table td:nth-child(6) { text-align: right; width: 200px; }
-    .status-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-    .badge-cod { background: var(--warning-bg); color: var(--warning-text); }
-    .badge-online { background: var(--success-bg); color: var(--success-text); }
-    .badge-status { background: var(--info-bg); color: var(--info-text); }
-    .btn-view { border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; text-decoration: none; display: inline-block; margin-top: 5px; transition: 0.2s; }
-    .btn-view:hover { background: var(--primary-color); color: white; }
-    .btn-update { background: #ffd814; border: 1px solid #fcd200; padding: 5px 10px; font-size: 12px; border-radius: 6px; font-weight: 600; transition: 0.2s; }
-    .btn-update:hover { background: #f7ca00; }
-    .form-select-sm { font-size: 12px; padding: 4px 6px; border-radius: 6px; }
-    .btn-back { margin-top: 20px; display: inline-block; background: #eee; padding: 8px 16px; border-radius: 6px; text-decoration: none; color: #333; }
+    .admin-table th { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding: 14px 10px; }
+    .admin-table td { padding: 14px 10px; border-bottom: 1px solid var(--border-color); }
+    .admin-table tbody tr:hover { background: #fafafa; }
+
+    /* BADGE BASE */
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* PAYMENT */
+    .badge-cod {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+    }
+
+    .badge-online {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+    }
+
+    /* STATUS COLORS */
+    .badge-pending {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+    }
+
+    .badge-confirmed {
+        background-color: #cce5ff !important;
+        color: #004085 !important;
+    }
+
+    .badge-shipped {
+        background-color: #d1ecf1 !important;
+        color: #0c5460 !important;
+    }
+
+    .badge-delivered {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+    }
+
+    .badge-cancelled {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+    }
+
+    .badge-notpaid {
+        background-color: #f5c6cb !important;
+        color: #721c24 !important;
+    }
+
+    .btn-view {
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        text-decoration: none;
+    }
+
+    .btn-view:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-back {
+        margin-top: 20px;
+        display: inline-block;
+        background: #eee;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+    }
 </style>
 
 @{
-
-    var selectedStatus = Context.Request.Query["statusFilter"].ToString();
     var statuses = new[] { "Pending", "Confirmed", "Shipped", "Delivered", "Cancelled" };
 }
 
@@ -63,23 +117,16 @@
             <i class="fas fa-clipboard-list"></i> Order Management
         </h1>
 
-        <!-- Status Filter -->
-        <form method="get" class="d-flex align-items-center gap-2">
-            <label for="statusFilter">Filter by Status:</label>
-            <select name="statusFilter" id="statusFilter" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="">All</option>
-
-                @foreach(var status in statuses)
-                {
-                    if (status == selectedStatus)
-                    {
-                        <option value="@status" selected>@status</option>
-                    }
-                    else
-                    {
-                        <option value="@status">@status</option>
-                    }
-                }
+        <!-- FILTER -->
+        <form method="get" asp-action="Orders" asp-controller="Admin">
+            <select name="status" class="form-select w-auto d-inline" onchange="this.form.submit()">
+                <option value="">All Orders</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Not Paid">Not Paid</option>
+                <option value="Cancelled">Cancelled</option>
             </select>
         </form>
     </div>
@@ -97,6 +144,7 @@
                         <th class="text-end">Action</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @if (!Model.Any())
                     {
@@ -108,13 +156,28 @@
                     {
                         @foreach (var order in Model)
                         {
+                            var payment = order.PaymentMethod?.Trim().ToLower();
+                            var status = order.Status?.Trim();
+
+                            string statusClass = status switch
+                            {
+                                "Pending" => "badge-pending",
+                                "Confirmed" => "badge-confirmed",
+                                "Shipped" => "badge-shipped",
+                                "Delivered" => "badge-delivered",
+                                "Cancelled" => "badge-cancelled",
+                                "Not Paid" => "badge-notpaid",
+                                _ => "badge-pending"
+                            };
+
                             <tr>
                                 <td>#@order.Id</td>
                                 <td>@order.Name</td>
                                 <td>₹@order.TotalAmount</td>
 
+                                <!-- PAYMENT -->
                                 <td>
-                                    @if (order.PaymentMethod == "COD")
+                                    @if (payment == "cod")
                                     {
                                         <span class="status-badge badge-cod">COD</span>
                                     }
@@ -124,24 +187,23 @@
                                     }
                                 </td>
 
+                                <!-- STATUS -->
                                 <td>
-                                    <span class="status-badge badge-status">@order.Status</span>
+                                    <span class="status-badge @statusClass">
+                                        @status
+                                    </span>
                                 </td>
 
+                                <!-- ACTION -->
                                 <td>
                                     <form asp-action="UpdateOrderStatus" method="post">
                                         <input type="hidden" name="orderId" value="@order.Id" />
                                         <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                                            @foreach(var status in statuses)
+                                            @foreach (var s in statuses)
                                             {
-                                                if (status == order.Status)
-                                                {
-                                                    <option value="@status" selected>@status</option>
-                                                }
-                                                else
-                                                {
-                                                    <option value="@status">@status</option>
-                                                }
+                                                <option value="@s" selected="@(s == status)">
+                                                    @s
+                                                </option>
                                             }
                                         </select>
                                     </form>

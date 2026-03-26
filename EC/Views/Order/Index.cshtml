@@ -361,7 +361,7 @@
                 </div>`;
 
             modal.style.display = "flex";
-            // Small timeout to allow display:flex to apply before adding opacity class for smooth animation
+         
             setTimeout(() => modal.classList.add("show"), 10);
 
             let url = type === 'user' ? '/Order/GetOrderDetails?id=' : '/Order/GetOrderDetails?id=';

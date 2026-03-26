@@ -158,13 +158,24 @@ namespace EC.Controllers
             return RedirectToAction("Products");
         }
         //======Orders============
-        public IActionResult Orders()
+        //public IActionResult Orders()
+        //{
+        //    int sellerId = GetCurrentUserId();
+        //    var orders = _db.GetOrdersBySeller(sellerId);
+        //    return View(orders);
+        //}
+        public IActionResult Orders(string status)
         {
             int sellerId = GetCurrentUserId();
             var orders = _db.GetOrdersBySeller(sellerId);
+
+            if (!string.IsNullOrEmpty(status))
+            {
+                orders = orders.Where(o => o.Status == status).ToList();
+            }
+
             return View(orders);
         }
-      
 
         // ================= PROFILE =================
         public IActionResult Profile()
@@ -173,7 +184,7 @@ namespace EC.Controllers
             var user = _db.GetUserProfile(sellerId) ?? new User();
             return View(user);
         }
-
+        //=================== profile ======================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Profile(User u)

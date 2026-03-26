@@ -8,7 +8,7 @@
 
 <style>
     body {
-        background: #f8fafc;
+        background: #f1f5f9;
         font-family: 'Segoe UI', sans-serif;
     }
 
@@ -20,9 +20,9 @@
 
     .card-box {
         background: #fff;
-        border-radius: 12px;
+        border-radius: 14px;
         border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
         padding: 20px;
         margin-bottom: 20px;
     }
@@ -35,18 +35,21 @@
 
     .order-title {
         font-weight: 700;
-        font-size: 22px;
-        color: #111827;
+        font-size: 20px;
     }
 
     .status-badge {
-        background: #ecfdf5;
-        color: #059669;
-        padding: 6px 14px;
-        border-radius: 30px;
+        padding: 8px 16px;
+        border-radius: 50px;
         font-size: 13px;
         font-weight: 600;
     }
+
+    .status-Pending { background: #fff3cd; color: #856404; }
+    .status-Processing { background: #cfe2ff; color: #084298; }
+    .status-Shipped { background: #cff4fc; color: #055160; }
+    .status-Delivered { background: #d1e7dd; color: #0f5132; }
+    .status-Cancelled { background: #f8d7da; color: #842029; }
 
     .summary-grid {
         display: grid;
@@ -55,27 +58,20 @@
     }
 
     .card-box h5 {
-        font-weight: 600;
         margin-bottom: 15px;
-        color: #374151;
-        border-bottom: 1px solid #f1f1f1;
+        border-bottom: 1px solid #eee;
         padding-bottom: 8px;
     }
 
     .info-text {
         font-size: 14px;
-        color: #4b5563;
         margin-bottom: 8px;
     }
 
-        .info-text strong {
-            color: #111827;
-        }
-
     .highlight {
-        font-size: 18px;
+        font-size: 20px;
         font-weight: 700;
-        color: #111827;
+        color: #dc2626;
     }
 
     /* PRODUCT */
@@ -84,17 +80,17 @@
         justify-content: space-between;
         align-items: center;
         border: 1px solid #eee;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 15px;
         margin-bottom: 15px;
-        transition: 0.2s;
         background: #fff;
+        transition: 0.25s;
     }
 
-        .product-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transform: translateY(-2px);
-        }
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
 
     .product-left {
         display: flex;
@@ -103,22 +99,10 @@
     }
 
     .product-img {
-        width: 75px;
-        height: 75px;
-        border-radius: 10px;
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
         object-fit: cover;
-        border: 1px solid #ddd;
-    }
-
-    .product-name {
-        font-weight: 600;
-        font-size: 15px;
-        color: #111827;
-    }
-
-    .product-info {
-        font-size: 13px;
-        color: #6b7280;
     }
 
     .price {
@@ -127,36 +111,81 @@
         color: #dc2626;
     }
 
-    /* TIMELINE */
-    .timeline-step {
+    /* TRACKING */
+    .tracking-container {
         display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        font-size: 14px;
-        color: #374151;
+        justify-content: space-between;
+        margin-top: 20px;
+        position: relative;
     }
 
-        .timeline-step i {
-            margin-right: 10px;
-            font-size: 18px;
-            color: #10b981;
-        }
+    .tracking-container::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 5%;
+        width: 90%;
+        height: 4px;
+        background: #e5e7eb;
+        z-index: 0;
+    }
+
+    .track-step {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        width: 100%;
+    }
+
+    .circle {
+        width: 40px;
+        height: 40px;
+        margin: auto;
+        border-radius: 50%;
+        background: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .track-step.done .circle {
+        background: #10b981;
+        color: white;
+    }
+
+    .track-step.active .circle {
+        background: #3b82f6;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .track-step p {
+        margin-top: 8px;
+        font-size: 13px;
+    }
+
+    /* CANCEL UI */
+    .cancel-box {
+        text-align: center;
+        padding: 25px;
+        border-radius: 12px;
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .cancel-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
 
     .btn-back {
         background: #111827;
         color: #fff;
         border-radius: 8px;
         padding: 10px 18px;
-        font-size: 14px;
         text-decoration: none;
-        display: inline-block;
-        transition: 0.2s;
     }
-
-        .btn-back:hover {
-            background: #000;
-            color: #fff;
-        }
 
     @@media (max-width: 768px) {
         .summary-grid {
@@ -165,31 +194,24 @@
     }
 </style>
 
-
 <div class="order-container">
+
+    @{
+        var order = Model.FirstOrDefault();
+    }
 
     <!-- HEADER -->
     <div class="card-box order-header">
-        <div class="order-title">
-            <i class="bi bi-box-seam"></i> Order Details
-        </div>
-
-        @{
-            var order = Model.FirstOrDefault();
-        }
-
-        <div class="status-badge">
+        <div class="order-title">📦 Order Details</div>
+        <div class="status-badge status-@order?.Status">
             @order?.Status
         </div>
     </div>
 
-
     <!-- SUMMARY -->
     <div class="summary-grid">
 
-        <!-- ORDER SUMMARY -->
         <div class="card-box">
-
             <h5>Order Summary</h5>
 
             @{
@@ -204,13 +226,9 @@
             <p class="info-text"><strong>Total Items:</strong> @Model.Count</p>
             <p class="info-text"><strong>Total Amount:</strong> <span class="highlight">₹@total</span></p>
             <p class="info-text"><strong>Order Date:</strong> @DateTime.Now.ToString("dd MMM yyyy")</p>
-
         </div>
 
-
-        <!-- CUSTOMER INFO -->
         <div class="card-box">
-
             <h5>Customer Details</h5>
 
             @{
@@ -220,112 +238,96 @@
             <p class="info-text"><strong>Name:</strong> @Order?.UserName</p>
             <p class="info-text"><strong>Phone:</strong> +91 @Order?.Phone</p>
             <p class="info-text"><strong>Address:</strong> @Order?.Address</p>
-
         </div>
 
     </div>
 
-
     <!-- PAYMENT -->
     <div class="card-box">
-
         <h5>Payment Method</h5>
-
-        <p class="info-text">
-            <i class="bi bi-credit-card"></i>
-            Cash on Delivery (COD)
-        </p>
-
+        <p class="info-text">💳 Cash on Delivery (COD)</p>
     </div>
 
-
     <!-- PRODUCTS -->
-    @if (Model != null && Model.Any())
+    @foreach (var item in Model)
     {
-        foreach (var item in Model)
+        <div class="product-card">
+            <div class="product-left">
+                <img src="/product-images/@item.ProductImage" class="product-img" />
+                <div>
+                    <div>@item.ProductName</div>
+                    <div>Qty: @item.Quantity</div>
+                </div>
+            </div>
+            <div class="price">₹@(item.Price * item.Quantity)</div>
+        </div>
+    }
+
+    <!-- TRACKING -->
+    @{
+        var status = order?.Status ?? "";
+        int step = 1;
+
+        if (status == "Processing") step = 2;
+        else if (status == "Shipped") step = 3;
+        else if (status == "Delivered") step = 4;
+    }
+
+    <div class="card-box">
+        <h5>Order Tracking</h5>
+
+        @if (status == "Cancelled")
         {
-            <div class="product-card">
+            <div class="cancel-box">
+                <div class="cancel-icon">✖</div>
+                <h4>Order Cancelled</h4>
+                <p>Your order has been cancelled.</p>
+            </div>
+        }
+        else
+        {
+            <div class="tracking-container">
 
-                <div class="product-left">
-
-                    <img src="/product-images/@item.ProductImage" class="product-img" />
-
-                    <div>
-                        <div class="product-name">@item.ProductName</div>
-                        <div class="product-info">Qty: @item.Quantity</div>
-                        <div class="product-info">Price: ₹@item.Price</div>
-                    </div>
-
+                <div class="track-step @(step >= 1 ? "done" : "") @(step == 1 ? "active" : "")">
+                    <div class="circle">1</div>
+                    <p>Placed</p>
                 </div>
 
-                <div class="price">
-                    ₹@(item.Price* item.Quantity)
+                <div class="track-step @(step >= 2 ? "done" : "") @(step == 2 ? "active" : "")">
+                    <div class="circle">2</div>
+                    <p>Processing</p>
+                </div>
+
+                <div class="track-step @(step >= 3 ? "done" : "") @(step == 3 ? "active" : "")">
+                    <div class="circle">3</div>
+                    <p>Shipped</p>
+                </div>
+
+                <div class="track-step @(step >= 4 ? "done" : "") @(step == 4 ? "active" : "")">
+                    <div class="circle">4</div>
+                    <p>Delivered</p>
                 </div>
 
             </div>
         }
-    }
-    else
-    {
-        <div class="card-box">
-            No products found in this order.
-        </div>
-    }
-
-
-    <!-- TIMELINE -->
-    @{
-        var status = order?.Status ?? "";
-    }
-
-    <div class="timeline-step">
-        <i class="bi bi-check-circle-fill"></i> Order Placed
     </div>
 
-    @if (status == "Processing" || status == "Shipped" || status == "Delivered")
-    {
-        <div class="timeline-step">
-            <i class="bi bi-box"></i> Processing
-        </div>
-    }
-
-    @if (status == "Shipped" || status == "Delivered")
-    {
-        <div class="timeline-step">
-            <i class="bi bi-truck"></i> Shipped
-        </div>
-    }
-
-    @if (status == "Delivered")
-    {
-        <div class="timeline-step">
-            <i class="bi bi-house"></i> Delivered
-        </div>
-    }
-
-
-
-
-@{
+    <!-- BACK -->
+    @{
         var role = User.FindFirst(ClaimTypes.Role)?.Value;
     }
 
     @if (role == "Admin")
     {
-        <a asp-controller="Admin" asp-action="Orders" class="btn-back">
-            ← Back to Orders
-        </a>
+        <a asp-controller="Admin" asp-action="Orders" class="btn-back">← Back</a>
     }
     else if (role == "Seller")
     {
-        <a asp-controller="Seller" asp-action="Orders" class="btn-back">
-            ← Back to Orders
-        </a>
+        <a asp-controller="Seller" asp-action="Orders" class="btn-back">← Back</a>
     }
     else
     {
-        <a asp-controller="Home" asp-action="Index" class="btn-back">
-            ← Back to Home
-        </a>
+        <a asp-controller="Home" asp-action="Index" class="btn-back">← Home</a>
     }
+
 </div>

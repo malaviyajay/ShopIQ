@@ -200,12 +200,8 @@
                                     @discount% OFF
                                 </span>
                             }
-
-                            <img src="@(string.IsNullOrEmpty(p.Image) ? Url.Content("~/images/green.jfif") : Url.Content("~/images/" + p.Image))"
-                                 alt="@p.Name"
-                                 class="product-img"
-                                 onerror="this.src='@Url.Content("~/images/green.jfif")'" />
-                        </div>
+                            <img src="@Url.Content("~/images/" + p.Image)"alt="@p.Name"class="product-img"onerror="this.style.display='none';" />
+                             </div>
 
                         <a asp-controller="Product" asp-action="Details" asp-route-id="@p.Id" class="text-decoration-none">
                             <div class="product-name">@p.Name</div>
