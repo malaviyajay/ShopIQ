@@ -1,9 +1,9 @@
-﻿using EC.Controllers;
+﻿
 using EC.Data;
 using EC.Helpers;
-using EC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 
 
 namespace EC.Controllers
@@ -139,7 +139,38 @@ namespace EC.Controllers
             TempData["Success"] = "Order status updated successfully!";
             return RedirectToAction("Index");
         }
+        //================================================================================================
+        // ================= DELIVERY TRACKING =================
+        [HttpGet]
+   
+        public IActionResult Track(int id)
+        {
+            int userId = HttpContext.UserId() ?? 0;
+
+            var items = _db.GetOrderItems(id, userId);
+
+            if (!items.Any())
+                return RedirectToAction("Index");
+
+            var order = items.FirstOrDefault();
+
+            // ✅ ORDER STATUS
+            ViewBag.OrderId = id;
+            ViewBag.Status = order.Status;
+
+            // ✅ DEMO WAREHOUSE LOCATION
+            ViewBag.WarehouseAddress = "Ahamdabad, Gujrat";
+
+            // ✅ CUSTOMER ADDRESS FROM DATABASE
+            ViewBag.CustomerAddress =
+                string.IsNullOrEmpty(order.Address)
+                ? "Ahamdabad, Gujrat"
+                : order.Address;
+
+            return View();
+        }
 
     }
 }
+
 

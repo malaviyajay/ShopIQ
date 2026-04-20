@@ -1394,5 +1394,49 @@ WHERE OD.OrderId = @orderId";
 
             return list;
         }
+        //============================================================
+        public void InsertDeliveryLocation(int orderId, double lat, double lng)
+        {
+            using var con = GetConnection();
+            con.Open();
+
+            var cmd = new SqlCommand(@"
+        INSERT INTO DeliveryTracking
+        (OrderId,Latitude,Longitude,Status)
+        VALUES(@o,@la,@ln,'OutForDelivery')", con);
+
+            cmd.Parameters.AddWithValue("@o", orderId);
+            cmd.Parameters.AddWithValue("@la", lat);
+            cmd.Parameters.AddWithValue("@ln", lng);
+
+            cmd.ExecuteNonQuery();
+        }
+        public object GetLatestLocation(int orderId)
+        {
+            using var con = GetConnection();
+            con.Open();
+
+            var cmd = new SqlCommand(@"
+        SELECT TOP 1 Latitude,Longitude,Status
+        FROM DeliveryTracking
+        WHERE OrderId=@id
+        ORDER BY UpdatedAt DESC", con);
+
+            cmd.Parameters.AddWithValue("@id", orderId);
+
+            var rd = cmd.ExecuteReader();
+
+            if (rd.Read())
+            {
+                return new
+                {
+                    lat = Convert.ToDouble(rd["Latitude"]),
+                    lng = Convert.ToDouble(rd["Longitude"]),
+                    status = rd["Status"].ToString()
+                };
+            }
+
+            return null;
+        }
     }
 }

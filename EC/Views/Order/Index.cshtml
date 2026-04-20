@@ -312,10 +312,22 @@
                                                         }
                                                     </td>
 
-                                                    <td class="text-end">
+                                               @*      <td class="text-end">
                                                         <button class="btn-view" onclick="showOrderDetails(@o.Id, 'user')">
                                                             <i class="fas fa-file-invoice me-1"></i> View Details
                                                         </button>
+                                                    </td> *@
+                                                    <td class="text-end">
+                                                        <button class="btn-view"
+                                                                onclick="showOrderDetails(@o.Id, 'user')">
+                                                            <i class="fas fa-file-invoice me-1"></i> View Details
+                                                        </button>
+
+                                                    <a asp-controller="Order" asp-action="Track" asp-route-id="@o.Id"
+                                                           class="btn btn-primary ms-2">
+                                                            🚚 Track Delivery
+                                                        </a>
+
                                                     </td>
                                                 </tr>
                                             }

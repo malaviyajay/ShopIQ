@@ -298,18 +298,18 @@
                     }
 
                     <div class="dropdown">
-                                <a href="#"
-                                   class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
-                                   data-bs-toggle="dropdown">
-                                <!-- Account Icon -->
-                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
+                        <a href="#"
+                               class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
+                               data-bs-toggle="dropdown">
+                            <!-- Account Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
 
-                                    <span class="d-none d-sm-inline">Account</span>
-                                </a>
-                           <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <span class="d-none d-sm-inline">Account</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
 
                             <li>
                                 <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
@@ -317,13 +317,13 @@
                                 </a>
                             </li>
                             @if (User.Identity!.IsAuthenticated && User.IsInRole("Customer"))
-                    {
-                            <li>  
+                            {
+                                <li>
                                     <a class="dropdown-item" asp-controller="Order" asp-action="Index">
                                         <i class="bi bi-box-seam me-2"></i> My Orders
                                     </a>
-                            </li>
-                    }
+                                </li>
+                            }
                             <li><hr class="dropdown-divider"></li>
 
                             <li>
@@ -340,10 +340,10 @@
                     @if (UserRoles.Any() && UserRoles.Count > 1)
                     {
                         <div class="dropdown">
-                                <a href="#"
+                            <a href="#"
                                    class="d-flex align-items-center text-decoration-none dropdown-toggle account-toggle text-dark fw-semibold"
                                    data-bs-toggle="dropdown">
-                                  <!-- Switch Role/User Icon -->
+                                <!-- Switch Role/User Icon -->
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat">
                                     <polyline points="17 1 21 5 17 9"></polyline>
                                     <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -351,8 +351,8 @@
                                     <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
                                 </svg>
 
-                                    <span class="d-none d-sm-inline">Switch Role</span>
-                                </a>
+                                <span class="d-none d-sm-inline">Switch Role</span>
+                            </a>
 
                             <ul class="dropdown-menu dropdown-menu-end shadow">
 
@@ -391,28 +391,15 @@
     <main class="container mt-4 pt-2">
         @RenderBody()
     </main>
-    <footer class="footer bg-dark text-light pt-5">
-        <div class="container">
-            <div class="row">
-
-                <!-- Social & Newsletter -->
-                <div class="col-md-4 mb-4">
-                    <h5 class="fw-semibold mb-3">Connect with Us</h5>
-
-                    <!-- Social icons -->
-                    <div class="d-flex gap-2 mb-3">
-                        <a href="https://www.facebook.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
-                        <a href="https://www.instagram.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-instagram"></i></a>
-                        <a href="https://www.youtube.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-youtube"></i></a>
-                        <a href="https://twitter.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-twitter"></i></a>
-                    </div>
-                </div>
-
-            </div>
-            <hr class="border-secondary">
-            <div class="text-center small text-muted pb-3">
-                &copy; 2026 ShopIQ Inc. All rights reserved. with Designed <span class="text-primary"></span>.
-            </div>
+    <footer class="social-footer">
+        <div class="social-container">
+            <a href="https://www.facebook.com" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://x.com" class="social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.instagram.com" class="social-btn"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com" class="social-btn"><i class="bi bi-youtube"></i></i></a>
+        </div>
+        <div class="copyright-text">
+            &copy; 2026 EC Shop. All rights reserved.
         </div>
     </footer>
 

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
+using EC.Helpers;
+
 namespace EC.Controllers;
 
 [Authorize(Roles = "Customer")]
@@ -14,6 +16,21 @@ public class CartController : Controller
     public CartController(DbHelper db)
     {
         _db = db;
+    }
+
+    // ================= USER ID HELPER =================
+    private string GetUserId()
+    {
+        //// 🔥 FIX: Your system stores UserId inside Name claim
+        //return User.FindFirstValue(ClaimTypes.Name)
+        //       ?? User.FindFirstValue(ClaimTypes.NameIdentifier)
+        //       ?? "guest";
+        int? userId = HttpContext.UserId();
+
+        if (userId == null)
+            return "guest";
+
+        return userId.Value.ToString();
     }
 
     // =================== CART PAGE ===================
@@ -36,23 +53,25 @@ public class CartController : Controller
             int productId = kv.Key;
             int qty = kv.Value;
 
-            using var cmd = new SqlCommand("SELECT * FROM Products WHERE Id=@id", con);
+            using var cmd = new SqlCommand(
+                "SELECT * FROM Products WHERE Id=@id", con);
+
             cmd.Parameters.AddWithValue("@id", productId);
 
             using var rd = cmd.ExecuteReader();
 
             if (rd.Read())
             {
-                int stockQty = rd["Quantity"] == DBNull.Value ? 0 : Convert.ToInt32(rd["Quantity"]);
+                int stockQty = rd["Quantity"] == DBNull.Value
+                    ? 0
+                    : Convert.ToInt32(rd["Quantity"]);
 
-                // ❗ If product is out of stock, skip it
                 if (stockQty <= 0)
                 {
                     rd.Close();
                     continue;
                 }
 
-                // Auto-adjust if cart qty > stock
                 if (qty > stockQty)
                     qty = stockQty;
 
@@ -84,12 +103,14 @@ public class CartController : Controller
         using var con = _db.GetConnection();
         con.Open();
 
-        using var cmd = new SqlCommand("SELECT Quantity FROM Products WHERE Id=@id", con);
+        using var cmd = new SqlCommand(
+            "SELECT Quantity FROM Products WHERE Id=@id", con);
+
         cmd.Parameters.AddWithValue("@id", id);
 
         var result = cmd.ExecuteScalar();
 
-        if (result == null || result == DBNull.Value)
+        if (result == null)
         {
             TempData["Error"] = "Product not found!";
             return RedirectToAction("Index", "Home");
@@ -97,7 +118,6 @@ public class CartController : Controller
 
         int stockQty = Convert.ToInt32(result);
 
-        // ✅ OUT OF STOCK CHECK
         if (stockQty <= 0)
         {
             TempData["Error"] = "Product is out of stock!";
@@ -107,10 +127,9 @@ public class CartController : Controller
         var items = GetCartItems();
         int existingQty = items.ContainsKey(id) ? items[id] : 0;
 
-        // ✅ STOCK LIMIT CHECK
         if (existingQty + quantity > stockQty)
         {
-            TempData["Error"] = $"Only {stockQty} items available in stock!";
+            TempData["Error"] = $"Only {stockQty} items available!";
             return RedirectToAction("Index");
         }
 
@@ -125,7 +144,7 @@ public class CartController : Controller
         return RedirectToAction("Index");
     }
 
-    // =================== INCREASE QTY ===================
+    // =================== INCREASE ===================
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult IncreaseQty(int id)
@@ -135,41 +154,13 @@ public class CartController : Controller
         if (!items.ContainsKey(id))
             return RedirectToAction("Index");
 
-        using var con = _db.GetConnection();
-        con.Open();
-
-        using var cmd = new SqlCommand("SELECT Quantity FROM Products WHERE Id=@id", con);
-        cmd.Parameters.AddWithValue("@id", id);
-
-        var result = cmd.ExecuteScalar();
-
-        if (result == null || result == DBNull.Value)
-        {
-            TempData["Error"] = "Product not found!";
-            return RedirectToAction("Index");
-        }
-
-        int stockQty = Convert.ToInt32(result);
-
-        if (stockQty <= 0)
-        {
-            TempData["Error"] = "Product is out of stock!";
-            return RedirectToAction("Index");
-        }
-
-        if (items[id] + 1 > stockQty)
-        {
-            TempData["Error"] = $"Only {stockQty} items available!";
-            return RedirectToAction("Index");
-        }
-
         items[id]++;
         SaveCartItems(items);
 
         return RedirectToAction("Index");
     }
 
-    // =================== DECREASE QTY ===================
+    // =================== DECREASE ===================
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult DecreaseQty(int id)
@@ -188,7 +179,7 @@ public class CartController : Controller
         return RedirectToAction("Index");
     }
 
-    // =================== REMOVE ITEM ===================
+    // =================== REMOVE ===================
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult RemoveFromCart(int id)
@@ -205,7 +196,10 @@ public class CartController : Controller
     // =================== GET CART ===================
     private Dictionary<int, int> GetCartItems()
     {
-        string cart = Request.Cookies["Cart"] ?? "";
+        string cookieName = $"Cart_{GetUserId()}";
+
+        string cart = Request.Cookies[cookieName] ?? "";
+
         Dictionary<int, int> items = new();
 
         if (!string.IsNullOrEmpty(cart))
@@ -215,10 +209,10 @@ public class CartController : Controller
                 var parts = c.Split(':');
 
                 if (parts.Length == 2 &&
-                    int.TryParse(parts[0], out int productId) &&
+                    int.TryParse(parts[0], out int pid) &&
                     int.TryParse(parts[1], out int qty))
                 {
-                    items[productId] = qty;
+                    items[pid] = qty;
                 }
             }
         }
@@ -229,6 +223,8 @@ public class CartController : Controller
     // =================== SAVE CART ===================
     private void SaveCartItems(Dictionary<int, int> items)
     {
+        string cookieName = $"Cart_{GetUserId()}";
+
         string cart = string.Join(",", items.Select(x => $"{x.Key}:{x.Value}"));
 
         var options = new CookieOptions
@@ -239,8 +235,15 @@ public class CartController : Controller
             IsEssential = true
         };
 
-        Response.Cookies.Append("Cart", cart, options);
+        Response.Cookies.Append(cookieName, cart, options);
+    }
 
-        ViewBag.CartCount = items.Sum(x => x.Value);
+    // =================== CART COUNT ===================
+    [HttpGet]
+    [AllowAnonymous]
+    public IActionResult CartCount()
+    {
+        var items = GetCartItems();
+        return Json(items.Sum(x => x.Value));
     }
 }

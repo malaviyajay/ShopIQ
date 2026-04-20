@@ -34,7 +34,7 @@ public class CheckoutController : Controller
         {
             UserId = userId,
             UserName = userName,
-            TotalAmount = cartItems.Sum(x => x.Price * x.Quantity),
+            TotalAmount = cartItems.Sum(x => x. Price * x.Quantity),
             Items = cartItems.Select(x =>
             {
                 var product = _db.GetProducts(x.ProductId);

@@ -1,0 +1,270 @@
+﻿@{
+    ViewData["Title"] = "Track Delivery";
+    string status = ViewBag.Status?.ToString()?.ToLower() ?? "";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#f8fafc;
+    --border:#e7e7e7;
+}
+
+/* ================= CONTAINER ================= */
+
+.track-container{
+    max-width:1100px;
+    margin:40px auto;
+    padding:20px;
+    background:var(--bg);
+    border-radius:12px;
+}
+
+.track-card{
+    background:#fff;
+    border-radius:12px;
+    border:1px solid var(--border);
+}
+
+/* ================= TIMELINE ================= */
+
+.timeline{
+    display:flex;
+    justify-content:space-between;
+    padding:20px;
+    background:#fafafa;
+}
+
+.step{
+    flex:1;
+    text-align:center;
+}
+
+.step i{
+    width:48px;
+    height:48px;
+    line-height:48px;
+    border-radius:50%;
+    background:#cbd5e1;
+    color:#fff;
+    transition:.35s;
+}
+
+/* ===== STEP COLORS ===== */
+
+.step.placed.active i{background:#3B82F6;}
+.step.packed.active i{background:#8B5CF6;}
+.step.shipped.active i{background:#F59E0B;}
+.step.out.active i{background:#06B6D4;}
+.step.delivered.active i{background:#10B981;}
+
+.step.cancelled.active i{
+    background:#EF4444;
+}
+
+.step.active div{
+    font-weight:600;
+}
+
+#map{
+    height:500px;
+    width:100%;
+}
+
+.badge-live{
+    background:#10B981;
+    color:#fff;
+    padding:6px 12px;
+    border-radius:20px;
+}
+
+.status-cancel{
+    padding:40px;
+    text-align:center;
+    color:#EF4444;
+    font-size:18px;
+}
+
+</style>
+
+<div class="track-container">
+<div class="track-card">
+
+<div class="p-3 d-flex justify-content-between">
+<h3><i class="fas fa-truck"></i> Delivery Tracking</h3>
+<b>Order #@ViewBag.OrderId</b>
+</div>
+
+<!-- ================= TIMELINE ================= -->
+
+<div class="timeline">
+
+<div class="step placed" id="step-placed">
+<i class="fas fa-check"></i>
+<div>Placed</div>
+</div>
+
+<div class="step packed" id="step-packed">
+<i class="fas fa-box"></i>
+<div>Packed</div>
+</div>
+
+<div class="step shipped" id="step-shipped">
+<i class="fas fa-shipping-fast"></i>
+<div>Shipped</div>
+</div>
+
+<div class="step out" id="step-out">
+<i class="fas fa-truck"></i>
+<div>Out for Delivery</div>
+</div>
+
+<div class="step delivered" id="step-delivered">
+<i class="fas fa-home"></i>
+<div>Delivered</div>
+</div>
+
+</div>
+
+<p class="p-3">
+<b>Status:</b>
+<span id="statusText">@ViewBag.Status</span>
+</p>
+
+@if(status=="cancelled")
+{
+    <!-- ✅ CANCEL LOGIC NOT CHANGED -->
+    <div class="status-cancel">
+        ❌ Order Cancelled — Tracking unavailable
+    </div>
+}
+else
+{
+    <div id="map"></div>
+
+    <div class="p-3">
+        <span class="badge-live">● Live Tracking Active</span>
+    </div>
+}
+
+</div>
+</div>
+
+@if(status!="cancelled")
+{
+<script>
+
+const orderStatus="@status";
+
+/* ===============================
+   TIMELINE COLOR CONTROL
+================================*/
+
+function updateTimeline(status){
+
+const steps=["placed","packed","shipped","out","delivered"];
+
+let index=steps.indexOf(status);
+if(index<0) index=0;
+
+steps.forEach((s,i)=>{
+const el=document.getElementById("step-"+s);
+if(!el) return;
+
+if(i<=index)
+el.classList.add("active");
+});
+}
+
+updateTimeline(orderStatus);
+
+/* ===============================
+   GOOGLE MAP
+================================*/
+
+let map;
+let marker;
+
+const deliveryRoute=[
+{lat:22.997148,lng:72.667313},
+{lat:22.999800,lng:72.669500},
+{lat:23.002500,lng:72.672100},
+{lat:23.004800,lng:72.675200},
+{lat:23.007200,lng:72.678000}
+];
+
+async function initMap(){
+
+const {Map}=await google.maps.importLibrary("maps");
+const {AdvancedMarkerElement}=await google.maps.importLibrary("marker");
+
+map=new Map(document.getElementById("map"),{
+zoom:14,
+center:deliveryRoute[0],
+mapId:"DEMO_MAP_ID"
+});
+
+marker=new AdvancedMarkerElement({
+map:map,
+position:deliveryRoute[0],
+content:createTruckIcon()
+});
+
+moveTruck();
+}
+
+function createTruckIcon(){
+const img=document.createElement("img");
+img.src="https://maps.google.com/mapfiles/kml/shapes/truck.png";
+img.style.width="50px";
+return img;
+}
+
+/* ===============================
+   TRUCK MOVEMENT
+================================*/
+
+function moveTruck(){
+
+let segment=0;
+let step=0;
+
+const interval=setInterval(()=>{
+
+if(segment>=deliveryRoute.length-1){
+
+clearInterval(interval);
+
+document.getElementById("statusText").innerText="Delivered ✅";
+updateTimeline("delivered");
+
+return;
+}
+
+const start=deliveryRoute[segment];
+const end=deliveryRoute[segment+1];
+
+const lat=start.lat+(end.lat-start.lat)*(step/60);
+const lng=start.lng+(end.lng-start.lng)*(step/60);
+
+marker.position={lat,lng};
+map.panTo({lat,lng});
+
+step++;
+
+if(step>60){
+step=0;
+segment++;
+}
+
+},80);
+}
+
+</script>
+
+<script async
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD9kh1WgWOaF7xlVRjrauOwdT1VZJdFGsE&callback=initMap&v=weekly&libraries=marker">
+</script>
+}
